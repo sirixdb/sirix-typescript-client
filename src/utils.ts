@@ -1,5 +1,5 @@
 export function contentType(type: string) {
-  if (type.toLowerCase() === 'json') {
+  if (type === 'json') {
     return 'application/json';
   } else {
     return 'application/xml';
