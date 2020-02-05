@@ -9,10 +9,10 @@
         "target": "ES6"
     },
     "files": [
+        "./index.ts",
         "./src/auth.ts",
         "./src/client.ts",
         "./src/database.ts",
-        "./src/index.ts",
         "./src/info.ts",
         "./src/resource.ts"
     ]
