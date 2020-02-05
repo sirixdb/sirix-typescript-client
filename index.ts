@@ -1,2 +1,2 @@
-import { Sirix } from "./lib/client";
+import Sirix from "./src/client";
 export default Sirix;
