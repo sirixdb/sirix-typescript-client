@@ -7,10 +7,10 @@ export default class Database {
     let db = sirixInfo.databaseInfo.filter(obj => obj.name === name);
     if (db.length > 0) {
       this.type = db[0].type;
-      this.exists = true;
+    } else {
+      this.create();
     }
   }
-  public exists: boolean = false;
   /**
    * delete
    */
@@ -30,7 +30,26 @@ export default class Database {
    * resource
    */
   public resource() {
-    
+
+  }
+  /**
+   * getInfo
+   */
+  public async getInfo(): Promise<DatabaseInfo> {
+    let res = await Axios.get(`this.sirixInfo.sirixUri/${this.name}`,
+      {
+        headers: {
+          Accept: 'application/json',
+          Authorization: `Bearer ${this.authData.access_token}`
+        }
+      });
+    if (res.status >= 400) {
+      console.error(res.status, res.data);
+      return null;
+    }
+    let db = this.sirixInfo.databaseInfo.filter(obj => obj.name === name)[0];
+    updateData(db, JSON.parse(res.data));
+    return db;
   }
   private async create(): Promise<boolean> {
     let res = await Axios.put(`${this.sirixInfo.sirixUri}/${this.name}`, {},
@@ -39,7 +58,7 @@ export default class Database {
           { Authorization: `Bearer ${this.authData.access_token}`, 'Content-Type': contentType(this.type) }
       })
     if (res.status === 201) {
-      updateData(res.data, this.sirixInfo.databaseInfo);
+      this.getInfo();
       return true;
     } else {
       console.error(res.status, res.data);

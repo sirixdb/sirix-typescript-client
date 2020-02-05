@@ -7,7 +7,7 @@ export function contentType(type: string) {
 }
 
 
-export function updateData(updated: AuthData | DatabaseInfo[], old: AuthData | DatabaseInfo[]) {
+export function updateData(updated: AuthData | DatabaseInfo | DatabaseInfo[], old: AuthData | DatabaseInfo | DatabaseInfo[]) {
   for (let key in Object.keys(updated)) {
     old[key] = updated[key];
   }

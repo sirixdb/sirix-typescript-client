@@ -28,9 +28,9 @@ export default class Sirix {
     return new Database(db_name, db_type, this.sirixInfo, this.authData);
   }
   /**
-   * get_info
+   * getInfo
    */
-  public async get_info(): Promise<DatabaseInfo[]> {
+  public async getInfo(): Promise<DatabaseInfo[]> {
     let res = await Axios.get(this.sirixInfo.sirixUri,
       {
         params: { withResources: true },
