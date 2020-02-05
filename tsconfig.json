@@ -6,7 +6,6 @@
         "outDir": "./lib",
         "removeComments": true,
         "preserveConstEnums": true,
-        "sourceMap": true,
         "target": "ES6"
     },
     "files": [
