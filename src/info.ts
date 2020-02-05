@@ -7,7 +7,7 @@ interface DatabaseInfo {
   name: string
   type: string
   resources: string[]
-} 
+}
 
 interface LoginInfo {
   username: string
@@ -39,3 +39,5 @@ interface ReadParams {
   "start-revision-timestamp"?: string,
   "end-revision-timestamp"?: string
 }
+
+export { SirixInfo, DatabaseInfo, LoginInfo, AuthData, Revision, ReadParams }

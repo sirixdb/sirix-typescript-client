@@ -1,6 +1,7 @@
 import Axios from 'axios'
 
 import { updateData } from './utils'
+import { SirixInfo, LoginInfo, AuthData } from './info'
 
 export default class Auth {
   constructor(private loginInfo: LoginInfo, private sirixInfo: SirixInfo, private authData: AuthData) {

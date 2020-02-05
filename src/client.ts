@@ -3,6 +3,8 @@ import Axios from 'axios';
 import Auth from './auth';
 import Database from './database'
 
+import { SirixInfo, AuthData, DatabaseInfo } from './info'
+
 export default class Sirix {
   constructor(username: string, password: string, sirixUri: string) {
     this.sirixInfo.sirixUri = sirixUri;

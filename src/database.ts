@@ -2,6 +2,8 @@ import Axios from 'axios';
 
 import { contentType, updateData } from './utils';
 
+import { SirixInfo, AuthData, DatabaseInfo } from './info'
+
 export default class Database {
   constructor(private name: string, private type: string, private sirixInfo: SirixInfo, private authData: AuthData) {
     let db = sirixInfo.databaseInfo.filter(obj => obj.name === name);

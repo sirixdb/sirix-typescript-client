@@ -3,6 +3,7 @@
   "version": "1.0.0",
   "description": "A typescript client for interacting with SirixDB",
   "main": "index.js",
+  "types": "./lib/index.d.ts",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },

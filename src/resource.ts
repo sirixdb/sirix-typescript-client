@@ -3,6 +3,8 @@ import Axios from "axios";
 import { contentType, Insert } from './utils';
 import Database from "./database";
 
+import { SirixInfo, AuthData, Revision, ReadParams } from './info'
+
 export default class Resource {
   constructor(
     private dbName: string,
