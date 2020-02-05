@@ -25,3 +25,5 @@ interface AuthData {
   session_state: string
   scope: string
 }
+
+type Revision = number | Date
