@@ -1,6 +1,6 @@
 import Axios from "axios";
 
-import { contentType, updateData } from './utils';
+import { contentType } from './utils';
 import Database from "./database";
 
 export default class Resource {
@@ -21,9 +21,24 @@ export default class Resource {
     }
   }
   private exists: boolean = false;
-  private async create(): Promise<boolean> {
-    ///TODO
-    return null;
+  private async create(data): Promise<boolean> {
+    let res = await Axios.put(`${this.sirixInfo.sirixUri}/${this.dbName}/${this.resourceName}`,
+      data,
+      {
+        headers: {
+          Authorization: this.authData.access_token,
+          'Content-Type': contentType(this.type),
+          'Accept': contentType(this.type)
+        }
+      }
+    );
+    if (res.status !== 200) {
+      console.error(res.status, res.data);
+      return false;
+    } else {
+      this.parent.getInfo();
+      return true;
+    }
   }
   /**
    * read
@@ -35,7 +50,7 @@ export default class Resource {
     withMetadata: boolean = false
   ): Promise<string> {
     if (!this.exists) {
-      let created = await this.create();
+      let created = await this.create(null);
       if (!created) {
         return null;
       }
@@ -78,15 +93,48 @@ export default class Resource {
     }
   }
   /**
+   * updateById
+   */
+  public async updateById(nodeId: number, data: string, insert): Promise<boolean> {
+    let params = { nodeId };
+    let head = await Axios.head(
+      `${this.sirixInfo.sirixUri}/${this.dbName}/${this.resourceName}`,
+      {
+        params, headers: {
+          Authorization: this.authData.access_token, 'Content-Type': contentType(this.type)
+        }
+      }
+    )
+    if (head.status !== 200) {
+      console.log(head.status, head.data);
+      return null;
+    }
+    let ETag = head.headers['ETag'];
+    return await this.update(nodeId, ETag, data, insert);
+  }
+  /**
    * update
    */
-  public async update(nodeId: number, data, insert) {
-    ///TODO
+  public async update(nodeId: number, ETag: string, data: string, insert): Promise<boolean> {
+    let res = await Axios.post(
+      `${this.sirixInfo.sirixUri}/${this.dbName}/${this.resourceName}`,
+      data,
+      {
+        params: { nodeId, insert },
+        headers: {
+          Authorization: this.authData.access_token, 'Content-Type': contentType(this.type)
+        }
+      })
+    if (res.status !== 201) {
+      console.error(res.status, res.data);
+      return false;
+    }
+    return true;
   }
   /**
    * delete
    */
-  public async delete(nodeId: number | null) {
+  public async delete(nodeId: number | null): Promise<boolean> {
     let params = {}
     if (nodeId !== null) {
       params['nodeId'] = nodeId;
