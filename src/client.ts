@@ -7,7 +7,7 @@ import { SirixInfo, AuthData, DatabaseInfo } from './info'
 
 export default class Sirix {
   constructor(username: string, password: string, sirixUri: string) {
-    this.sirixInfo.sirixUri = sirixUri;
+    this.sirixInfo = { sirixUri };
     // initialize with null, so as to fit with the interface
     this.authData = {
       access_token: null,
