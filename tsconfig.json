@@ -3,7 +3,6 @@
         "declaration": true,
         "module": "commonjs",
         "noImplicitAny": true,
-        "outDir": "./lib",
         "removeComments": true,
         "preserveConstEnums": true,
         "target": "ES6"
