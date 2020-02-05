@@ -22,7 +22,7 @@ export default class Database {
       console.error(res.status, res.data);
       return false;
     } else {
-
+      this.getInfo();
       return true;
     }
   }

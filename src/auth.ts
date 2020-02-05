@@ -27,6 +27,7 @@ export default class Auth {
       { headers: { 'Content-Type': 'multipart/form-data' } });
     if (res.status >= 400) {
       console.error(res.status, res.data);
+      // TODO make this configurable
       await this.authenticate();
       this.setRefreshTimeout();
     } else {

@@ -56,7 +56,7 @@ export default class Sirix {
       console.error(res.status, res.data);
       return false;
     }
-    await this.get_info();
+    await this.getInfo();
     return true;
   }
 }
