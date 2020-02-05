@@ -1,0 +1,18 @@
+{
+    "compilerOptions": {
+        "module": "commonjs",
+        "noImplicitAny": true,
+        "outDir": "./lib",
+        "removeComments": true,
+        "preserveConstEnums": true,
+        "sourceMap": true,
+        "target": "ES6"
+    },
+    "files": [
+        "./src/auth.ts",
+        "./src/client.ts",
+        "./src/database.ts",
+        "./src/info.ts",
+        "./src/resource.ts"
+    ]
+}

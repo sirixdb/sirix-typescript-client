@@ -4,7 +4,7 @@ import Auth from './auth';
 import Database from './database'
 
 export default class Sirix {
-  constructor(username, password, sirixUri) {
+  constructor(username: string, password: string, sirixUri: string) {
     this.sirixInfo.sirixUri = sirixUri;
     // initialize with null, so as to fit with the interface
     this.authData = {

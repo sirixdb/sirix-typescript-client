@@ -7,8 +7,15 @@ export function contentType(type: string) {
 }
 
 
-export function updateData(updated: AuthData | DatabaseInfo | DatabaseInfo[], old: AuthData | DatabaseInfo | DatabaseInfo[]) {
+export function updateData(updated: any, old: any) {
   for (let key in Object.keys(updated)) {
     old[key] = updated[key];
   }
+}
+
+export enum Insert {
+  CHILD = "asFirstChild",
+  LEFT = "asLeftSibling",
+  RIGHT = "asRightSibling",
+  REPLACE = "replace"
 }

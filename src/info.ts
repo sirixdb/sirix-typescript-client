@@ -27,3 +27,15 @@ interface AuthData {
 }
 
 type Revision = number | Date
+
+interface ReadParams {
+  nodeId?: number,
+  maxLevel?: number,
+  withMetadata?: boolean,
+  revision?: number,
+  "revision-timestamp"?: string,
+  "start-revision"?: number,
+  "end-revision"?: number,
+  "start-revision-timestamp"?: string,
+  "end-revision-timestamp"?: string
+}
