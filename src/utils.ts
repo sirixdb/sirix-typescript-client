@@ -8,9 +8,7 @@ export function contentType(type: string) {
 
 
 export function updateData(updated: any, old: any) {
-  for (let key in Object.keys(updated)) {
-    old[key] = updated[key];
-  }
+  Object.assign(old, updated);
 }
 
 export enum Insert {

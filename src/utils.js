@@ -10,9 +10,7 @@ function contentType(type) {
 }
 exports.contentType = contentType;
 function updateData(updated, old) {
-    for (let key in Object.keys(updated)) {
-        old[key] = updated[key];
-    }
+    Object.assign(old, updated);
 }
 exports.updateData = updateData;
 var Insert;

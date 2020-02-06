@@ -1,3 +1,4 @@
 import Sirix from "./src/client";
 import Auth from "./src/auth";
-export default { Sirix, Auth };
+import { Insert } from "./src/utils"
+export default { Sirix, Auth, Insert };
