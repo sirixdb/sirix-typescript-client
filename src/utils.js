@@ -1,4 +1,6 @@
-export function contentType(type) {
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+function contentType(type) {
     if (type === 'json') {
         return 'application/json';
     }
@@ -6,15 +8,17 @@ export function contentType(type) {
         return 'application/xml';
     }
 }
-export function updateData(updated, old) {
-    for (let key in Object.keys(updated)) {
+exports.contentType = contentType;
+function updateData(updated, old) {
+    for (var key in Object.keys(updated)) {
         old[key] = updated[key];
     }
 }
-export var Insert;
+exports.updateData = updateData;
+var Insert;
 (function (Insert) {
     Insert["CHILD"] = "asFirstChild";
     Insert["LEFT"] = "asLeftSibling";
     Insert["RIGHT"] = "asRightSibling";
     Insert["REPLACE"] = "replace";
-})(Insert || (Insert = {}));
+})(Insert = exports.Insert || (exports.Insert = {}));

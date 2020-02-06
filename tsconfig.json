@@ -1,12 +1,13 @@
 {
     "compilerOptions": {
         "declaration": true,
-        "module": "ESNext",
+        "lib": [ "es2015", "DOM" ],
+        "module": "commonjs",
         "moduleResolution": "node",
         "noImplicitAny": true,
         "removeComments": true,
         "preserveConstEnums": true,
-        "target": "ES6"
+        "target": "es5"
     },
     "files": [
         "./index.ts",
