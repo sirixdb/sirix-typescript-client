@@ -28,8 +28,7 @@ export default class Auth {
   }
   public async authenticate() {
     let res = await Axios.post(`${this.sirixInfo.sirixUri}/token`,
-      { username: this.loginInfo.username, password: this.loginInfo.password, grant_type: 'password' },
-      { headers: { 'Content-Type': 'application/json' } });
+      { username: this.loginInfo.username, password: this.loginInfo.password, grant_type: 'password' });
     if (res.status >= 400) {
       console.error(res.status, res.data);
       return false;
@@ -52,8 +51,7 @@ export default class Auth {
   }
   private async refresh() {
     let res = await Axios.post(`${this.sirixInfo.sirixUri}/token`,
-      { refresh_token: this.authData.refresh_token, grant_type: 'refresh_token' },
-      { headers: { 'Content-Type': 'application/json' } });
+      { refresh_token: this.authData.refresh_token, grant_type: 'refresh_token' });
     if (res.status >= 400) {
       console.error(res.status, res.data);
       await this.callback();
