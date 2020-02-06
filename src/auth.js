@@ -44,7 +44,11 @@ class Auth {
     }
     authenticate() {
         return __awaiter(this, void 0, void 0, function* () {
+<<<<<<< HEAD
             let res = yield axios_1.default.post(`${this.sirixInfo.sirixUri}/token`, qs_1.default.stringify({ username: this.loginInfo.username, password: this.loginInfo.password, grant_type: 'password' }), { headers: { 'Content-Type': 'application/x-www-form-urlencoded' } });
+=======
+            let res = yield axios_1.default.post(`${this.sirixInfo.sirixUri}/token`, { username: this.loginInfo.username, password: this.loginInfo.password, grant_type: 'password' }, { headers: { 'Content-Type': 'multipart/form-data' } });
+>>>>>>> parent of bd125ec... fix auth content-type
             if (res.status >= 400) {
                 console.error(res.status, res.data);
                 return false;
@@ -66,7 +70,11 @@ class Auth {
     }
     refresh() {
         return __awaiter(this, void 0, void 0, function* () {
+<<<<<<< HEAD
             let res = yield axios_1.default.post(`${this.sirixInfo.sirixUri}/token`, qs_1.default.stringify({ refresh_token: this.authData.refresh_token, grant_type: 'refresh_token' }), { headers: { 'Content-Type': 'application/x-www-form-urlencoded' } });
+=======
+            let res = yield axios_1.default.post(`${this.sirixInfo.sirixUri}/token`, { refresh_token: this.authData.refresh_token, grant_type: 'refresh_token' }, { headers: { 'Content-Type': 'multipart/form-data' } });
+>>>>>>> parent of bd125ec... fix auth content-type
             if (res.status >= 400) {
                 console.error(res.status, res.data);
                 yield this.callback();
