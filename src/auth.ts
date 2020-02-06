@@ -5,22 +5,37 @@ import { SirixInfo, LoginInfo, AuthData } from './info'
 
 export default class Auth {
   constructor(private loginInfo: LoginInfo, private sirixInfo: SirixInfo, private authData: AuthData, public callback: Function) {
-    this.authenticate().then(() => {
-      this.setRefreshTimeout();
+    this.authenticate().then(result => {
+      if (result) {
+        this.ready = true;
+      }
     });
   }
+  private timeout: number;
+  public ready: boolean;
   public async authenticate() {
     let res = await Axios.post(`${this.sirixInfo.sirixUri}/token`,
       { username: this.loginInfo.username, password: this.loginInfo.password, grant_type: 'password' },
       { headers: { 'Content-Type': 'multipart/form-data' } });
     if (res.status >= 400) {
       console.error(res.status, res.data);
+      return false;
     } else {
       updateData(JSON.parse(res.data), this.authData);
+      this.setRefreshTimeout();
+      return true;
     }
   }
   private setRefreshTimeout() {
-    setTimeout(() => this.refresh(), this.authData.expires_in - 5);
+    this.timeout = setTimeout(() => this.refresh(), this.authData.expires_in - 5);
+  }
+  /**
+   * destroy
+   */
+  public destroy() {
+    if (this.timeout) {
+      clearTimeout(this.timeout)
+    }
   }
   private async refresh() {
     let res = await Axios.post(`${this.sirixInfo.sirixUri}/token`,
@@ -28,7 +43,6 @@ export default class Auth {
       { headers: { 'Content-Type': 'multipart/form-data' } });
     if (res.status >= 400) {
       console.error(res.status, res.data);
-      // TODO make this configurable
       await this.callback();
       this.setRefreshTimeout();
     } else {

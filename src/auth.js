@@ -17,8 +17,10 @@ class Auth {
         this.sirixInfo = sirixInfo;
         this.authData = authData;
         this.callback = callback;
-        this.authenticate().then(() => {
-            this.setRefreshTimeout();
+        this.authenticate().then(result => {
+            if (result) {
+                this.ready = true;
+            }
         });
     }
     authenticate() {
@@ -26,14 +28,22 @@ class Auth {
             let res = yield axios_1.default.post(`${this.sirixInfo.sirixUri}/token`, { username: this.loginInfo.username, password: this.loginInfo.password, grant_type: 'password' }, { headers: { 'Content-Type': 'multipart/form-data' } });
             if (res.status >= 400) {
                 console.error(res.status, res.data);
+                return false;
             }
             else {
                 utils_1.updateData(JSON.parse(res.data), this.authData);
+                this.setRefreshTimeout();
+                return true;
             }
         });
     }
     setRefreshTimeout() {
-        setTimeout(() => this.refresh(), this.authData.expires_in - 5);
+        this.timeout = setTimeout(() => this.refresh(), this.authData.expires_in - 5);
+    }
+    destroy() {
+        if (this.timeout) {
+            clearTimeout(this.timeout);
+        }
     }
     refresh() {
         return __awaiter(this, void 0, void 0, function* () {
