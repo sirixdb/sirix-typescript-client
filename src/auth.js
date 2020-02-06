@@ -8,8 +8,12 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
         step((generator = generator.apply(thisArg, _arguments || [])).next());
     });
 };
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
 Object.defineProperty(exports, "__esModule", { value: true });
-const axios_1 = require("axios");
+const axios_1 = __importDefault(require("axios"));
+const qs_1 = __importDefault(require("qs"));
 const utils_1 = require("./utils");
 class Auth {
     constructor(loginInfo, sirixInfo, authData, callback) {
@@ -40,7 +44,7 @@ class Auth {
     }
     authenticate() {
         return __awaiter(this, void 0, void 0, function* () {
-            let res = yield axios_1.default.post(`${this.sirixInfo.sirixUri}/token`, { username: this.loginInfo.username, password: this.loginInfo.password, grant_type: 'password' }, { headers: { 'Content-Type': 'application/x-www-form-urlencoded' } });
+            let res = yield axios_1.default.post(`${this.sirixInfo.sirixUri}/token`, qs_1.default.stringify({ username: this.loginInfo.username, password: this.loginInfo.password, grant_type: 'password' }), { headers: { 'Content-Type': 'application/x-www-form-urlencoded' } });
             if (res.status >= 400) {
                 console.error(res.status, res.data);
                 return false;
@@ -62,7 +66,7 @@ class Auth {
     }
     refresh() {
         return __awaiter(this, void 0, void 0, function* () {
-            let res = yield axios_1.default.post(`${this.sirixInfo.sirixUri}/token`, { refresh_token: this.authData.refresh_token, grant_type: 'refresh_token' }, { headers: { 'Content-Type': 'application/x-www-form-urlencoded' } });
+            let res = yield axios_1.default.post(`${this.sirixInfo.sirixUri}/token`, qs_1.default.stringify({ refresh_token: this.authData.refresh_token, grant_type: 'refresh_token' }), { headers: { 'Content-Type': 'application/x-www-form-urlencoded' } });
             if (res.status >= 400) {
                 console.error(res.status, res.data);
                 yield this.callback();

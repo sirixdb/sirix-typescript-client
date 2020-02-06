@@ -8,10 +8,13 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
         step((generator = generator.apply(thisArg, _arguments || [])).next());
     });
 };
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
 Object.defineProperty(exports, "__esModule", { value: true });
-const axios_1 = require("axios");
-const auth_1 = require("./auth");
-const database_1 = require("./database");
+const axios_1 = __importDefault(require("axios"));
+const auth_1 = __importDefault(require("./auth"));
+const database_1 = __importDefault(require("./database"));
 class Sirix {
     constructor(username, password, sirixUri, callback) {
         this.sirixInfo = { sirixUri };
