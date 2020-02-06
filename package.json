@@ -4,6 +4,7 @@
   "description": "A typescript client for interacting with SirixDB",
   "main": "./index.ts",
   "types": "./index.d.ts",
+  "type": "module",
   "scripts": {
     "build": "tsc"
   },
