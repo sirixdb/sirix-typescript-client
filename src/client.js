@@ -25,7 +25,7 @@ class Sirix {
             session_state: null,
             scope: null
         };
-        new auth_1.default({ username, password, clientId: 'sirix' }, this.sirixInfo, this.authData, callback);
+        this.auth = new auth_1.default({ username, password, clientId: 'sirix' }, this.sirixInfo, this.authData, callback);
     }
     database(db_name, db_type = null) {
         return __awaiter(this, void 0, void 0, function* () {
