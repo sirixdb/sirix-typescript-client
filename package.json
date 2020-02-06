@@ -4,9 +4,9 @@
   "description": "A typescript client for interacting with SirixDB",
   "main": "./index.ts",
   "types": "./index.d.ts",
-  "type": "module",
   "scripts": {
-    "build": "tsc"
+    "build": "tsc",
+    "webpack": "webpack"
   },
   "author": "",
   "license": "ISC",
@@ -14,6 +14,9 @@
     "axios": "^0.19.2"
   },
   "devDependencies": {
-    "typescript": "^3.7.5"
+    "ts-loader": "^6.2.1",
+    "typescript": "^3.7.5",
+    "webpack": "^4.41.5",
+    "webpack-cli": "^3.3.10"
   }
 }
