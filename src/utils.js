@@ -10,7 +10,7 @@ function contentType(type) {
 }
 exports.contentType = contentType;
 function updateData(updated, old) {
-    for (var key in Object.keys(updated)) {
+    for (let key in Object.keys(updated)) {
         old[key] = updated[key];
     }
 }
