@@ -2,7 +2,7 @@
   "name": "sirix",
   "version": "1.0.0",
   "description": "A typescript client for interacting with SirixDB",
-  "main": "./bundle.js",
+  "main": "./index.ts",
   "types": "./index.d.ts",
   "type": "module",
   "scripts": {
