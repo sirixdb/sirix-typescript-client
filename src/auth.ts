@@ -7,14 +7,25 @@ export default class Auth {
   constructor(private loginInfo: LoginInfo, private sirixInfo: SirixInfo, private authData: AuthData, public callback: Function) {
     this.authenticate().then(result => {
       if (result) {
-        this.ready = true;
+        this._ready = true;
       } else {
-        this.ready = false;
+        this._ready = false;
       }
     });
   }
   private timeout: number;
-  public ready: boolean = null;
+  private _ready: boolean = null;
+  /**
+   * ready
+   */
+  public async ready(): Promise<boolean> {
+    if (this._ready !== null) {
+      return this._ready;
+    } else {
+      await new Promise(r => setTimeout(r, 100));
+      return this.ready()
+    }
+  }
   public async authenticate() {
     let res = await Axios.post(`${this.sirixInfo.sirixUri}/token`,
       { username: this.loginInfo.username, password: this.loginInfo.password, grant_type: 'password' },

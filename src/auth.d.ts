@@ -6,7 +6,8 @@ export default class Auth {
     callback: Function;
     constructor(loginInfo: LoginInfo, sirixInfo: SirixInfo, authData: AuthData, callback: Function);
     private timeout;
-    ready: boolean;
+    private _ready;
+    ready(): Promise<boolean>;
     authenticate(): Promise<boolean>;
     private setRefreshTimeout;
     destroy(): void;

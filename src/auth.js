@@ -17,13 +17,24 @@ class Auth {
         this.sirixInfo = sirixInfo;
         this.authData = authData;
         this.callback = callback;
-        this.ready = null;
+        this._ready = null;
         this.authenticate().then(result => {
             if (result) {
-                this.ready = true;
+                this._ready = true;
             }
             else {
-                this.ready = false;
+                this._ready = false;
+            }
+        });
+    }
+    ready() {
+        return __awaiter(this, void 0, void 0, function* () {
+            if (this._ready !== null) {
+                return this._ready;
+            }
+            else {
+                yield new Promise(r => setTimeout(r, 100));
+                return this.ready();
             }
         });
     }
