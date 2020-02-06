@@ -28,17 +28,8 @@ export default class Auth {
   }
   public async authenticate() {
     let res = await Axios.post(`${this.sirixInfo.sirixUri}/token`,
-<<<<<<< HEAD
-<<<<<<< HEAD
-      qs.stringify({ username: this.loginInfo.username, password: this.loginInfo.password, grant_type: 'password' }),
-=======
       { username: this.loginInfo.username, password: this.loginInfo.password, grant_type: 'password' },
->>>>>>> parent of 8a3f2d1... fix auth encoding
-      { headers: { 'Content-Type': 'application/x-www-form-urlencoded' } });
-=======
-      { username: this.loginInfo.username, password: this.loginInfo.password, grant_type: 'password' },
-      { headers: { 'Content-Type': 'multipart/form-data' } });
->>>>>>> parent of bd125ec... fix auth content-type
+      { headers: { 'Content-Type': 'application/json' } });
     if (res.status >= 400) {
       console.error(res.status, res.data);
       return false;
@@ -61,17 +52,8 @@ export default class Auth {
   }
   private async refresh() {
     let res = await Axios.post(`${this.sirixInfo.sirixUri}/token`,
-<<<<<<< HEAD
-<<<<<<< HEAD
-      qs.stringify({ refresh_token: this.authData.refresh_token, grant_type: 'refresh_token' }),
-=======
       { refresh_token: this.authData.refresh_token, grant_type: 'refresh_token' },
->>>>>>> parent of 8a3f2d1... fix auth encoding
-      { headers: { 'Content-Type': 'application/x-www-form-urlencoded' } });
-=======
-      { refresh_token: this.authData.refresh_token, grant_type: 'refresh_token' },
-      { headers: { 'Content-Type': 'multipart/form-data' } });
->>>>>>> parent of bd125ec... fix auth content-type
+      { headers: { 'Content-Type': 'application/json' } });
     if (res.status >= 400) {
       console.error(res.status, res.data);
       await this.callback();
