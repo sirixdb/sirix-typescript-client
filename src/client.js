@@ -1,4 +1,3 @@
-"use strict";
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
     return new (P || (P = Promise))(function (resolve, reject) {
@@ -8,11 +7,10 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
         step((generator = generator.apply(thisArg, _arguments || [])).next());
     });
 };
-Object.defineProperty(exports, "__esModule", { value: true });
-const axios_1 = require("axios");
-const auth_1 = require("./auth");
-const database_1 = require("./database");
-class Sirix {
+import Axios from 'axios';
+import Auth from './auth';
+import Database from './database';
+export default class Sirix {
     constructor(username, password, sirixUri, callback) {
         this.sirixInfo = { sirixUri };
         this.authData = {
@@ -25,16 +23,16 @@ class Sirix {
             session_state: null,
             scope: null
         };
-        this.auth = new auth_1.default({ username, password, clientId: 'sirix' }, this.sirixInfo, this.authData, callback);
+        this.auth = new Auth({ username, password, clientId: 'sirix' }, this.sirixInfo, this.authData, callback);
     }
     database(db_name, db_type = null) {
         return __awaiter(this, void 0, void 0, function* () {
-            return new database_1.default(db_name, db_type, this.sirixInfo, this.authData);
+            return new Database(db_name, db_type, this.sirixInfo, this.authData);
         });
     }
     getInfo() {
         return __awaiter(this, void 0, void 0, function* () {
-            let res = yield axios_1.default.get(this.sirixInfo.sirixUri, {
+            let res = yield Axios.get(this.sirixInfo.sirixUri, {
                 params: { withResources: true },
                 headers: {
                     Accept: 'application/json',
@@ -51,7 +49,7 @@ class Sirix {
     }
     delete() {
         return __awaiter(this, void 0, void 0, function* () {
-            let res = yield axios_1.default.delete(this.sirixInfo.sirixUri, { headers: { Authorization: this.authData.access_token } });
+            let res = yield Axios.delete(this.sirixInfo.sirixUri, { headers: { Authorization: this.authData.access_token } });
             if (res.status >= 400) {
                 console.error(res.status, res.data);
                 return false;
@@ -61,4 +59,3 @@ class Sirix {
         });
     }
 }
-exports.default = Sirix;

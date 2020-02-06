@@ -1,4 +1,3 @@
-"use strict";
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
     return new (P || (P = Promise))(function (resolve, reject) {
@@ -8,10 +7,9 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
         step((generator = generator.apply(thisArg, _arguments || [])).next());
     });
 };
-Object.defineProperty(exports, "__esModule", { value: true });
-const axios_1 = require("axios");
-const utils_1 = require("./utils");
-class Database {
+import Axios from 'axios';
+import { contentType, updateData } from './utils';
+export default class Database {
     constructor(name, type, sirixInfo, authData) {
         this.name = name;
         this.type = type;
@@ -27,7 +25,7 @@ class Database {
     }
     delete() {
         return __awaiter(this, void 0, void 0, function* () {
-            let res = yield axios_1.default.delete(`${this.sirixInfo.sirixUri}/${this.name}`, { headers: { Authorization: this.authData.access_token, 'Content-Type': utils_1.contentType(this.type) } });
+            let res = yield Axios.delete(`${this.sirixInfo.sirixUri}/${this.name}`, { headers: { Authorization: this.authData.access_token, 'Content-Type': contentType(this.type) } });
             if (res.status !== 204) {
                 console.error(res.status, res.data);
                 return false;
@@ -42,7 +40,7 @@ class Database {
     }
     getInfo() {
         return __awaiter(this, void 0, void 0, function* () {
-            let res = yield axios_1.default.get(`this.sirixInfo.sirixUri/${this.name}`, {
+            let res = yield Axios.get(`this.sirixInfo.sirixUri/${this.name}`, {
                 headers: {
                     Accept: 'application/json',
                     Authorization: `Bearer ${this.authData.access_token}`
@@ -53,14 +51,14 @@ class Database {
                 return null;
             }
             let db = this.sirixInfo.databaseInfo.filter(obj => obj.name === name)[0];
-            utils_1.updateData(db, JSON.parse(res.data));
+            updateData(db, JSON.parse(res.data));
             return db;
         });
     }
     create() {
         return __awaiter(this, void 0, void 0, function* () {
-            let res = yield axios_1.default.put(`${this.sirixInfo.sirixUri}/${this.name}`, {}, {
-                headers: { Authorization: `Bearer ${this.authData.access_token}`, 'Content-Type': utils_1.contentType(this.type) }
+            let res = yield Axios.put(`${this.sirixInfo.sirixUri}/${this.name}`, {}, {
+                headers: { Authorization: `Bearer ${this.authData.access_token}`, 'Content-Type': contentType(this.type) }
             });
             if (res.status === 201) {
                 this.getInfo();
@@ -73,4 +71,3 @@ class Database {
         });
     }
 }
-exports.default = Database;
