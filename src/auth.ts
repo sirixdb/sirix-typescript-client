@@ -8,11 +8,13 @@ export default class Auth {
     this.authenticate().then(result => {
       if (result) {
         this.ready = true;
+      } else {
+        this.ready = false;
       }
     });
   }
   private timeout: number;
-  public ready: boolean;
+  public ready: boolean = null;
   public async authenticate() {
     let res = await Axios.post(`${this.sirixInfo.sirixUri}/token`,
       { username: this.loginInfo.username, password: this.loginInfo.password, grant_type: 'password' },

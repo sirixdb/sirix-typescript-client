@@ -17,9 +17,13 @@ class Auth {
         this.sirixInfo = sirixInfo;
         this.authData = authData;
         this.callback = callback;
+        this.ready = null;
         this.authenticate().then(result => {
             if (result) {
                 this.ready = true;
+            }
+            else {
+                this.ready = false;
             }
         });
     }
