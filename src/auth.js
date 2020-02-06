@@ -12,10 +12,11 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const axios_1 = require("axios");
 const utils_1 = require("./utils");
 class Auth {
-    constructor(loginInfo, sirixInfo, authData) {
+    constructor(loginInfo, sirixInfo, authData, callback) {
         this.loginInfo = loginInfo;
         this.sirixInfo = sirixInfo;
         this.authData = authData;
+        this.callback = callback;
         this.authenticate().then(() => {
             this.setRefreshTimeout();
         });
@@ -39,7 +40,7 @@ class Auth {
             let res = yield axios_1.default.post(`${this.sirixInfo.sirixUri}/token`, { refresh_token: this.authData.refresh_token, grant_type: 'refresh_token' }, { headers: { 'Content-Type': 'multipart/form-data' } });
             if (res.status >= 400) {
                 console.error(res.status, res.data);
-                yield this.authenticate();
+                yield this.callback();
                 this.setRefreshTimeout();
             }
             else {

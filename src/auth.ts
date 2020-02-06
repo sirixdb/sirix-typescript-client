@@ -4,12 +4,12 @@ import { updateData } from './utils'
 import { SirixInfo, LoginInfo, AuthData } from './info'
 
 export default class Auth {
-  constructor(private loginInfo: LoginInfo, private sirixInfo: SirixInfo, private authData: AuthData) {
+  constructor(private loginInfo: LoginInfo, private sirixInfo: SirixInfo, private authData: AuthData, public callback: Function) {
     this.authenticate().then(() => {
       this.setRefreshTimeout();
     });
   }
-  private async authenticate() {
+  public async authenticate() {
     let res = await Axios.post(`${this.sirixInfo.sirixUri}/token`,
       { username: this.loginInfo.username, password: this.loginInfo.password, grant_type: 'password' },
       { headers: { 'Content-Type': 'multipart/form-data' } });
@@ -29,7 +29,7 @@ export default class Auth {
     if (res.status >= 400) {
       console.error(res.status, res.data);
       // TODO make this configurable
-      await this.authenticate();
+      await this.callback();
       this.setRefreshTimeout();
     } else {
       let authData: AuthData = JSON.parse(res.data);

@@ -1,7 +1,7 @@
 import Database from './database';
 import { DatabaseInfo } from './info';
 export default class Sirix {
-    constructor(username: string, password: string, sirixUri: string);
+    constructor(username: string, password: string, sirixUri: string, callback: Function);
     private sirixInfo;
     private authData;
     database(db_name: string, db_type?: string): Promise<Database>;
