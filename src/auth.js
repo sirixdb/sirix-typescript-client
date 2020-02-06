@@ -46,7 +46,7 @@ class Auth {
                 return false;
             }
             else {
-                utils_1.updateData(JSON.parse(res.data), this.authData);
+                utils_1.updateData(res.data, this.authData);
                 this.setRefreshTimeout();
                 return true;
             }
@@ -69,7 +69,7 @@ class Auth {
                 this.setRefreshTimeout();
             }
             else {
-                let authData = JSON.parse(res.data);
+                let authData = res.data;
                 utils_1.updateData(authData, this.authData);
                 this.setRefreshTimeout();
             }

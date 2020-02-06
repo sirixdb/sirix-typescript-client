@@ -33,7 +33,7 @@ export default class Auth {
       console.error(res.status, res.data);
       return false;
     } else {
-      updateData(JSON.parse(res.data), this.authData);
+      updateData(res.data, this.authData);
       this.setRefreshTimeout();
       return true;
     }
@@ -57,7 +57,7 @@ export default class Auth {
       await this.callback();
       this.setRefreshTimeout();
     } else {
-      let authData: AuthData = JSON.parse(res.data);
+      let authData: AuthData = res.data;
       updateData(authData, this.authData);
       this.setRefreshTimeout();
     }
