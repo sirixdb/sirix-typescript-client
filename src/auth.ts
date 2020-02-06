@@ -39,7 +39,7 @@ export default class Auth {
     }
   }
   private setRefreshTimeout() {
-    this.timeout = setTimeout(() => this.refresh(), this.authData.expires_in - 5);
+    this.timeout = setTimeout(() => this.refresh(), (this.authData.expires_in - 5) * 1000);
   }
   /**
    * destroy
