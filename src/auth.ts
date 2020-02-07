@@ -13,7 +13,7 @@ export default class Auth {
       }
     });
   }
-  private timeout: number;
+  private timeout: any;
   private _ready: boolean = null;
   /**
    * ready
