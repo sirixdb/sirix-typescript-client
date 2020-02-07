@@ -44,7 +44,7 @@ export default class Database {
    * getInfo
    */
   public getInfo(): Promise<DatabaseInfo> {
-    return Axios.get(`this.sirixInfo.sirixUri/${this.name}`,
+    return Axios.get(`${this.sirixInfo.sirixUri}/${this.name}`,
       {
         headers: {
           Accept: 'application/json',

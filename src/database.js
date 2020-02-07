@@ -34,7 +34,7 @@ class Database {
     resource() {
     }
     getInfo() {
-        return axios_1.default.get(`this.sirixInfo.sirixUri/${this.name}`, {
+        return axios_1.default.get(`${this.sirixInfo.sirixUri}/${this.name}`, {
             headers: {
                 Accept: 'application/json',
                 Authorization: `Bearer ${this.authData.access_token}`
