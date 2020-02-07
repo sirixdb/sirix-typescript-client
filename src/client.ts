@@ -27,8 +27,14 @@ export default class Sirix {
   /**
    * database
    */
-  public database(db_name: string, db_type: string = null): Database {
-    return new Database(db_name, db_type, this.sirixInfo, this.authData);
+  public database(db_name: string, db_type: string = null): Promise<Database> {
+    const db = new Database(db_name, db_type, this.sirixInfo, this.authData);
+    return db.ready().then(res => {
+      if (res) {
+        return db;
+      }
+      return null;
+    });
   }
   /**
    * getInfo
