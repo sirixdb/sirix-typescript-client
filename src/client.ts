@@ -22,7 +22,7 @@ export default class Sirix {
     this.auth = new Auth({ username, password, clientId: 'sirix' }, this.sirixInfo, this.authData, callback);
   }
   public auth: Auth;
-  private sirixInfo: SirixInfo;
+  public sirixInfo: SirixInfo;
   private authData: AuthData;
   /**
    * database
