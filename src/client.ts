@@ -27,27 +27,28 @@ export default class Sirix {
   /**
    * database
    */
-  public async database(db_name: string, db_type: string = null): Promise<Database> {
+  public database(db_name: string, db_type: string = null): Database {
     return new Database(db_name, db_type, this.sirixInfo, this.authData);
   }
   /**
    * getInfo
    */
-  public async getInfo(): Promise<DatabaseInfo[]> {
-    let res = await Axios.get(this.sirixInfo.sirixUri,
+  public getInfo(): Promise<DatabaseInfo[]> {
+    return Axios.get(this.sirixInfo.sirixUri,
       {
         params: { withResources: true },
         headers: {
           Accept: 'application/json',
           Authorization: `Bearer ${this.authData.access_token}`
         }
+      }).then(res => {
+        if (res.status >= 400) {
+          console.error(res.status, res.data);
+          return null;
+        }
+        this.sirixInfo.databaseInfo = JSON.parse(res.data);
+        return this.sirixInfo.databaseInfo;    
       });
-    if (res.status >= 400) {
-      console.error(res.status, res.data);
-      return null;
-    }
-    this.sirixInfo.databaseInfo = JSON.parse(res.data);
-    return this.sirixInfo.databaseInfo;
   }
   /**
    * delete

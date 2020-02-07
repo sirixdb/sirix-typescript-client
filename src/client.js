@@ -33,14 +33,13 @@ class Sirix {
         });
     }
     getInfo() {
-        return __awaiter(this, void 0, void 0, function* () {
-            let res = yield axios_1.default.get(this.sirixInfo.sirixUri, {
-                params: { withResources: true },
-                headers: {
-                    Accept: 'application/json',
-                    Authorization: `Bearer ${this.authData.access_token}`
-                }
-            });
+        return axios_1.default.get(this.sirixInfo.sirixUri, {
+            params: { withResources: true },
+            headers: {
+                Accept: 'application/json',
+                Authorization: `Bearer ${this.authData.access_token}`
+            }
+        }).then(res => {
             if (res.status >= 400) {
                 console.error(res.status, res.data);
                 return null;
