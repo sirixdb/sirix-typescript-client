@@ -17,30 +17,10 @@ class Auth {
         this.sirixInfo = sirixInfo;
         this.authData = authData;
         this.callback = callback;
-        this._ready = null;
-        this.authenticate().then(result => {
-            if (result) {
-                this._ready = true;
-            }
-            else {
-                this._ready = false;
-            }
-        });
-    }
-    ready() {
-        return __awaiter(this, void 0, void 0, function* () {
-            if (this._ready !== null) {
-                return this._ready;
-            }
-            else {
-                yield new Promise(r => setTimeout(r, 100));
-                return this.ready();
-            }
-        });
     }
     authenticate() {
-        return __awaiter(this, void 0, void 0, function* () {
-            let res = yield axios_1.default.post(`${this.sirixInfo.sirixUri}/token`, { username: this.loginInfo.username, password: this.loginInfo.password, grant_type: 'password' });
+        return axios_1.default.post(`${this.sirixInfo.sirixUri}/token`, { username: this.loginInfo.username, password: this.loginInfo.password, grant_type: 'password' })
+            .then(res => {
             if (res.status >= 400) {
                 console.error(res.status, res.data);
                 return false;
