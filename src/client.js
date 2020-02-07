@@ -28,9 +28,7 @@ class Sirix {
         this.auth = new auth_1.default({ username, password, clientId: 'sirix' }, this.sirixInfo, this.authData, callback);
     }
     database(db_name, db_type = null) {
-        return __awaiter(this, void 0, void 0, function* () {
-            return new database_1.default(db_name, db_type, this.sirixInfo, this.authData);
-        });
+        return new database_1.default(db_name, db_type, this.sirixInfo, this.authData);
     }
     getInfo() {
         return axios_1.default.get(this.sirixInfo.sirixUri, {

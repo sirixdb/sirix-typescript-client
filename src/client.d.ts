@@ -6,7 +6,7 @@ export default class Sirix {
     auth: Auth;
     private sirixInfo;
     private authData;
-    database(db_name: string, db_type?: string): Promise<Database>;
+    database(db_name: string, db_type?: string): Database;
     getInfo(): Promise<DatabaseInfo[]>;
     delete(): Promise<boolean>;
 }
