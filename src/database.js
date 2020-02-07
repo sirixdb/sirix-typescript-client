@@ -46,7 +46,7 @@ class Database {
                 return null;
             }
             let db = this.sirixInfo.databaseInfo.filter(obj => obj.name === name)[0];
-            utils_1.updateData(db, JSON.parse(res.data));
+            Object.assign(db, res.data);
             return db;
         });
     }

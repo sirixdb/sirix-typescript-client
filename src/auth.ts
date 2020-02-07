@@ -1,6 +1,5 @@
 import Axios from 'axios'
 
-import { updateData } from './utils'
 import { SirixInfo, LoginInfo, AuthData } from './info'
 
 export default class Auth {
@@ -17,7 +16,7 @@ export default class Auth {
           console.error(res.status, res.data);
           return false;
         } else {
-          updateData(res.data, this.authData);
+          Object.assign(this.authData, res.data);
           this.setRefreshTimeout();
           return true;
         }
@@ -42,8 +41,7 @@ export default class Auth {
       await this.callback();
       this.setRefreshTimeout();
     } else {
-      let authData: AuthData = res.data;
-      updateData(authData, this.authData);
+      Object.assign(this.authData, res.data);
       this.setRefreshTimeout();
     }
   }

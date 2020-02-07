@@ -9,10 +9,6 @@ function contentType(type) {
     }
 }
 exports.contentType = contentType;
-function updateData(updated, old) {
-    Object.assign(old, updated);
-}
-exports.updateData = updateData;
 var Insert;
 (function (Insert) {
     Insert["CHILD"] = "asFirstChild";

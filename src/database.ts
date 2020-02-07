@@ -1,6 +1,6 @@
 import Axios from 'axios';
 
-import { contentType, updateData } from './utils';
+import { contentType } from './utils';
 
 import { SirixInfo, AuthData, DatabaseInfo } from './info'
 
@@ -57,7 +57,7 @@ export default class Database {
           return null;
         }
         let db = this.sirixInfo.databaseInfo.filter(obj => obj.name === name)[0];
-        updateData(db, JSON.parse(res.data));
+        Object.assign(db, res.data);
         return db;
       });
   }

@@ -6,11 +6,6 @@ export function contentType(type: string) {
   }
 }
 
-
-export function updateData(updated: any, old: any) {
-  Object.assign(old, updated);
-}
-
 export enum Insert {
   CHILD = "asFirstChild",
   LEFT = "asLeftSibling",

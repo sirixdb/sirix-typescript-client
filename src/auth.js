@@ -10,7 +10,6 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 const axios_1 = require("axios");
-const utils_1 = require("./utils");
 class Auth {
     constructor(loginInfo, sirixInfo, authData, callback) {
         this.loginInfo = loginInfo;
@@ -26,7 +25,7 @@ class Auth {
                 return false;
             }
             else {
-                utils_1.updateData(res.data, this.authData);
+                Object.assign(this.authData, res.data);
                 this.setRefreshTimeout();
                 return true;
             }
@@ -49,8 +48,7 @@ class Auth {
                 this.setRefreshTimeout();
             }
             else {
-                let authData = res.data;
-                utils_1.updateData(authData, this.authData);
+                Object.assign(this.authData, res.data);
                 this.setRefreshTimeout();
             }
         });

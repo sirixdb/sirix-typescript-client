@@ -14,7 +14,7 @@ const auth_1 = require("./auth");
 const database_1 = require("./database");
 class Sirix {
     constructor(username, password, sirixUri, callback) {
-        this.sirixInfo = { sirixUri };
+        this.sirixInfo = { sirixUri, databaseInfo: [] };
         this.authData = {
             access_token: null,
             expires_in: null,
@@ -48,7 +48,7 @@ class Sirix {
                 console.error(res.status, res.data);
                 return null;
             }
-            this.sirixInfo.databaseInfo = JSON.parse(res.data);
+            Object.assign(this.sirixInfo.databaseInfo, res.data);
             return this.sirixInfo.databaseInfo;
         });
     }

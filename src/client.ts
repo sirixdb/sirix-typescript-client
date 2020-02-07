@@ -7,7 +7,7 @@ import { SirixInfo, AuthData, DatabaseInfo } from './info'
 
 export default class Sirix {
   constructor(username: string, password: string, sirixUri: string, callback: Function) {
-    this.sirixInfo = { sirixUri };
+    this.sirixInfo = { sirixUri, databaseInfo: [] };
     // initialize with null, so as to fit with the interface
     this.authData = {
       access_token: null,
@@ -52,7 +52,7 @@ export default class Sirix {
           console.error(res.status, res.data);
           return null;
         }
-        this.sirixInfo.databaseInfo = JSON.parse(res.data);
+        Object.assign(this.sirixInfo.databaseInfo, res.data);
         return this.sirixInfo.databaseInfo;    
       });
   }
