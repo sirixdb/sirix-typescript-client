@@ -52,7 +52,7 @@ export default class Sirix {
           console.error(res.status, res.data);
           return null;
         }
-        Object.assign(this.sirixInfo.databaseInfo, res.data);
+        this.sirixInfo.databaseInfo.splice(0, this.sirixInfo.databaseInfo.length, ...res.data);
         return this.sirixInfo.databaseInfo;    
       });
   }
