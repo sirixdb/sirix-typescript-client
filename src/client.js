@@ -13,8 +13,7 @@ const axios_1 = require("axios");
 const auth_1 = require("./auth");
 const database_1 = require("./database");
 class Sirix {
-    constructor(username, password, sirixUri, callback) {
-        this.sirixInfo = { sirixUri, databaseInfo: [] };
+    constructor() {
         this.authData = {
             access_token: null,
             expires_in: null,
@@ -25,6 +24,9 @@ class Sirix {
             session_state: null,
             scope: null
         };
+    }
+    authenticate(username, password, sirixUri, callback) {
+        this.sirixInfo = { sirixUri, databaseInfo: [] };
         this.auth = new auth_1.default({ username, password, clientId: 'sirix' }, this.sirixInfo, this.authData, callback);
     }
     database(db_name, db_type = null) {
