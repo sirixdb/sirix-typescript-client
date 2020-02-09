@@ -40,7 +40,7 @@ export default class Database {
    * resource
    */
   public resource(name: string): Resource {
-    return new Resource(this.name, name, this.type, this.sirixInfo, this.authData, this);
+    return new Resource(this.name, name, this.type, this.sirixInfo, this.authData);
   }
   /**
    * getInfo

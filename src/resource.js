@@ -11,14 +11,14 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 Object.defineProperty(exports, "__esModule", { value: true });
 const axios_1 = require("axios");
 const utils_1 = require("./utils");
+const database_1 = require("./database");
 class Resource {
-    constructor(dbName, resourceName, type, sirixInfo, authData, parent) {
+    constructor(dbName, resourceName, type, sirixInfo, authData) {
         this.dbName = dbName;
         this.resourceName = resourceName;
         this.type = type;
         this.sirixInfo = sirixInfo;
         this.authData = authData;
-        this.parent = parent;
         this.exists = false;
         let db = sirixInfo.databaseInfo.filter(obj => obj.name === name);
         if (db.length > 0) {
@@ -41,7 +41,7 @@ class Resource {
                 return false;
             }
             else {
-                this.parent.getInfo();
+                new database_1.default(this.dbName, this.type, this.sirixInfo, this.authData).getInfo();
                 return true;
             }
         });
@@ -136,7 +136,7 @@ class Resource {
                 return false;
             }
             else {
-                this.parent.getInfo();
+                new database_1.default(this.dbName, this.type, this.sirixInfo, this.authData).getInfo();
                 return true;
             }
         });

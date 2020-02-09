@@ -1,5 +1,4 @@
 import { Insert } from './utils';
-import Database from "./database";
 import { SirixInfo, AuthData, Revision } from './info';
 export default class Resource {
     private dbName;
@@ -7,8 +6,7 @@ export default class Resource {
     private type;
     private sirixInfo;
     private authData;
-    private parent;
-    constructor(dbName: string, resourceName: string, type: string, sirixInfo: SirixInfo, authData: AuthData, parent: Database);
+    constructor(dbName: string, resourceName: string, type: string, sirixInfo: SirixInfo, authData: AuthData);
     private exists;
     create(data: string): Promise<boolean>;
     read(nodeId: number | null, revision: Revision | [Revision, Revision] | null, maxLevel?: number | null, withMetadata?: boolean): Promise<string | JSON>;

@@ -12,7 +12,6 @@ export default class Resource {
     private type: string,
     private sirixInfo: SirixInfo,
     private authData: AuthData,
-    private parent: Database
   ) {
     let db = sirixInfo.databaseInfo.filter(obj => obj.name === name);
     if (db.length > 0) {
@@ -41,7 +40,7 @@ export default class Resource {
         console.error(res.status, res.data);
         return false;
       } else {
-        this.parent.getInfo();
+        new Database(this.dbName, this.type, this.sirixInfo, this.authData).getInfo();
         return true;
       }
     });
@@ -54,7 +53,7 @@ export default class Resource {
     revision: Revision | [Revision, Revision] | null,
     maxLevel: number | null = null,
     withMetadata: boolean = false
-  ): Promise<string|JSON> {
+  ): Promise<string | JSON> {
     if (!this.exists) {
       let created = await this.create("");
       if (!created) {
@@ -152,7 +151,7 @@ export default class Resource {
       console.error(res.status, res.data);
       return false;
     } else {
-      this.parent.getInfo()
+      new Database(this.dbName, this.type, this.sirixInfo, this.authData).getInfo();
       return true;
     }
   }

@@ -33,7 +33,7 @@ class Database {
         });
     }
     resource(name) {
-        return new resource_1.default(this.name, name, this.type, this.sirixInfo, this.authData, this);
+        return new resource_1.default(this.name, name, this.type, this.sirixInfo, this.authData);
     }
     getInfo() {
         return axios_1.default.get(`${this.sirixInfo.sirixUri}/${this.name}`, {
