@@ -10,8 +10,8 @@ export default class Resource {
     private parent;
     constructor(dbName: string, resourceName: string, type: string, sirixInfo: SirixInfo, authData: AuthData, parent: Database);
     private exists;
-    private create;
-    read(nodeId: number | null, revision: Revision | [Revision, Revision] | null, maxLevel?: number | null, withMetadata?: boolean): Promise<string>;
+    create(data: string): Promise<boolean>;
+    read(nodeId: number | null, revision: Revision | [Revision, Revision] | null, maxLevel?: number | null, withMetadata?: boolean): Promise<string | JSON>;
     updateById(nodeId: number, data: string, insert: Insert): Promise<boolean>;
     update(nodeId: number, ETag: string, data: string, insert: Insert): Promise<boolean>;
     delete(nodeId: number | null): Promise<boolean>;

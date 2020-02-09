@@ -2,6 +2,7 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 const axios_1 = require("axios");
 const utils_1 = require("./utils");
+const resource_1 = require("./resource");
 class Database {
     constructor(name, type, sirixInfo, authData) {
         this.name = name;
@@ -31,7 +32,8 @@ class Database {
             }
         });
     }
-    resource() {
+    resource(name) {
+        return new resource_1.default(this.name, name, this.type, this.sirixInfo, this.authData, this);
     }
     getInfo() {
         return axios_1.default.get(`${this.sirixInfo.sirixUri}/${this.name}`, {

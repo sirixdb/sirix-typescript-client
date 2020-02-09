@@ -4,6 +4,8 @@ import { contentType } from './utils';
 
 import { SirixInfo, AuthData, DatabaseInfo } from './info'
 
+import Resource from './resource';
+
 export default class Database {
   constructor(private name: string, private type: string, private sirixInfo: SirixInfo, private authData: AuthData) { }
   /**
@@ -37,8 +39,8 @@ export default class Database {
   /**
    * resource
    */
-  public resource() {
-
+  public resource(name: string): Resource {
+    return new Resource(this.name, name, this.type, this.sirixInfo, this.authData, this);
   }
   /**
    * getInfo

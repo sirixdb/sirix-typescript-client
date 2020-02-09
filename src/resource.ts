@@ -23,8 +23,11 @@ export default class Resource {
     }
   }
   private exists: boolean = false;
-  private async create(data: string): Promise<boolean> {
-    let res = await Axios.put(`${this.sirixInfo.sirixUri}/${this.dbName}/${this.resourceName}`,
+  /**
+   * create
+   */
+  public create(data: string): Promise<boolean> {
+    return Axios.put(`${this.sirixInfo.sirixUri}/${this.dbName}/${this.resourceName}`,
       data,
       {
         headers: {
@@ -33,14 +36,15 @@ export default class Resource {
           'Accept': contentType(this.type)
         }
       }
-    );
-    if (res.status !== 200) {
-      console.error(res.status, res.data);
-      return false;
-    } else {
-      this.parent.getInfo();
-      return true;
-    }
+    ).then(res => {
+      if (res.status !== 200) {
+        console.error(res.status, res.data);
+        return false;
+      } else {
+        this.parent.getInfo();
+        return true;
+      }
+    });
   }
   /**
    * read
@@ -50,9 +54,9 @@ export default class Resource {
     revision: Revision | [Revision, Revision] | null,
     maxLevel: number | null = null,
     withMetadata: boolean = false
-  ): Promise<string> {
+  ): Promise<string|JSON> {
     if (!this.exists) {
-      let created = await this.create(null);
+      let created = await this.create("");
       if (!created) {
         return null;
       }

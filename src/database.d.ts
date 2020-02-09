@@ -1,4 +1,5 @@
 import { SirixInfo, AuthData, DatabaseInfo } from './info';
+import Resource from './resource';
 export default class Database {
     private name;
     private type;
@@ -7,7 +8,7 @@ export default class Database {
     constructor(name: string, type: string, sirixInfo: SirixInfo, authData: AuthData);
     ready(): Promise<boolean>;
     delete(): Promise<boolean>;
-    resource(): void;
+    resource(name: string): Resource;
     getInfo(): Promise<DatabaseInfo>;
     private create;
 }

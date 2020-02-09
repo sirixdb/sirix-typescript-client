@@ -29,14 +29,13 @@ class Resource {
         }
     }
     create(data) {
-        return __awaiter(this, void 0, void 0, function* () {
-            let res = yield axios_1.default.put(`${this.sirixInfo.sirixUri}/${this.dbName}/${this.resourceName}`, data, {
-                headers: {
-                    Authorization: this.authData.access_token,
-                    'Content-Type': utils_1.contentType(this.type),
-                    'Accept': utils_1.contentType(this.type)
-                }
-            });
+        return axios_1.default.put(`${this.sirixInfo.sirixUri}/${this.dbName}/${this.resourceName}`, data, {
+            headers: {
+                Authorization: this.authData.access_token,
+                'Content-Type': utils_1.contentType(this.type),
+                'Accept': utils_1.contentType(this.type)
+            }
+        }).then(res => {
             if (res.status !== 200) {
                 console.error(res.status, res.data);
                 return false;
@@ -50,7 +49,7 @@ class Resource {
     read(nodeId, revision, maxLevel = null, withMetadata = false) {
         return __awaiter(this, void 0, void 0, function* () {
             if (!this.exists) {
-                let created = yield this.create(null);
+                let created = yield this.create("");
                 if (!created) {
                     return null;
                 }
