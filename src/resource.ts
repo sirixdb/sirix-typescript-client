@@ -1,7 +1,6 @@
 import Axios from "axios";
 
 import { contentType, Insert } from './utils';
-import Database from "./database";
 
 import { SirixInfo, AuthData, Revision, ReadParams } from './info'
 
@@ -40,7 +39,8 @@ export default class Resource {
         console.error(res.status, res.data);
         return false;
       } else {
-        new Database(this.dbName, this.type, this.sirixInfo, this.authData).getInfo();
+        let db = this.sirixInfo.databaseInfo.filter(obj => obj.name === name)[0];
+        db.resources.push(this.resourceName);
         return true;
       }
     });
@@ -151,7 +151,8 @@ export default class Resource {
       console.error(res.status, res.data);
       return false;
     } else {
-      new Database(this.dbName, this.type, this.sirixInfo, this.authData).getInfo();
+      let db = this.sirixInfo.databaseInfo.filter(obj => obj.name === name)[0];
+      db.resources.splice(db.resources.findIndex(val => this.resourceName));
       return true;
     }
   }
