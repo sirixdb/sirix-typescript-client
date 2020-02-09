@@ -36,20 +36,19 @@ class Database {
         return new resource_1.default(this.name, name, this.type, this.sirixInfo, this.authData);
     }
     getInfo() {
-        return axios_1.default.get(`${this.sirixInfo.sirixUri}/${this.name}`, {
+        return axios_1.default.get(this.sirixInfo.sirixUri, {
+            params: { withResources: true },
             headers: {
                 Accept: 'application/json',
                 Authorization: `Bearer ${this.authData.access_token}`
             }
-        })
-            .then(res => {
+        }).then(res => {
             if (res.status >= 400) {
                 console.error(res.status, res.data);
                 return null;
             }
-            let db = this.sirixInfo.databaseInfo.filter(obj => obj.name === name)[0];
-            Object.assign(db, res.data);
-            return db;
+            this.sirixInfo.databaseInfo.splice(0, this.sirixInfo.databaseInfo.length, ...res.data["databases"]);
+            return this.sirixInfo.databaseInfo;
         });
     }
     create() {
