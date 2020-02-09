@@ -52,8 +52,8 @@ export default class Sirix {
           console.error(res.status, res.data);
           return null;
         }
-        this.sirixInfo.databaseInfo.splice(0, this.sirixInfo.databaseInfo.length, ...res.data);
-        return this.sirixInfo.databaseInfo;    
+        this.sirixInfo.databaseInfo.splice(0, this.sirixInfo.databaseInfo.length, ...res.data["databases"]);
+        return this.sirixInfo.databaseInfo;
       });
   }
   /**
