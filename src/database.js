@@ -20,7 +20,7 @@ class Database {
         }
     }
     delete() {
-        return axios_1.default.delete(`${this.sirixInfo.sirixUri}/${this.name}`, { headers: { Authorization: this.authData.access_token, 'Content-Type': utils_1.contentType(this.type) } })
+        return axios_1.default.delete(`${this.sirixInfo.sirixUri}/${this.name}`, { headers: { Authorization: `Bearer ${this.authData.access_token}`, 'Content-Type': utils_1.contentType(this.type) } })
             .then(res => {
             if (res.status !== 204) {
                 console.error(res.status, res.data);

@@ -30,7 +30,7 @@ class Resource {
     create(data) {
         return axios_1.default.put(`${this.sirixInfo.sirixUri}/${this.dbName}/${this.resourceName}`, data, {
             headers: {
-                Authorization: this.authData.access_token,
+                Authorization: `Bearer ${this.authData.access_token}`,
                 'Content-Type': utils_1.contentType(this.type),
                 'Accept': utils_1.contentType(this.type)
             }
@@ -82,7 +82,7 @@ class Resource {
             }
             let res = yield axios_1.default.get(`${this.sirixInfo.sirixUri}/${this.dbName}/${this.resourceName}`, {
                 params: params,
-                headers: { Authorization: this.authData.access_token, 'Content-Type': utils_1.contentType(this.type) }
+                headers: { Authorization: `Bearer ${this.authData.access_token}`, 'Content-Type': utils_1.contentType(this.type) }
             });
             if (res.status !== 200) {
                 console.error(res.status, res.data);
@@ -98,7 +98,7 @@ class Resource {
             let params = { nodeId };
             let head = yield axios_1.default.head(`${this.sirixInfo.sirixUri}/${this.dbName}/${this.resourceName}`, {
                 params, headers: {
-                    Authorization: this.authData.access_token, 'Content-Type': utils_1.contentType(this.type)
+                    Authorization: `Bearer ${this.authData.access_token}`, 'Content-Type': utils_1.contentType(this.type)
                 }
             });
             if (head.status !== 200) {
@@ -114,7 +114,7 @@ class Resource {
             let res = yield axios_1.default.post(`${this.sirixInfo.sirixUri}/${this.dbName}/${this.resourceName}`, data, {
                 params: { nodeId, insert },
                 headers: {
-                    Authorization: this.authData.access_token, 'Content-Type': utils_1.contentType(this.type)
+                    Authorization: `Bearer ${this.authData.access_token}`, 'Content-Type': utils_1.contentType(this.type)
                 }
             });
             if (res.status !== 201) {
@@ -130,7 +130,7 @@ class Resource {
             if (nodeId !== null) {
                 params = { nodeId };
             }
-            let res = yield axios_1.default.delete(`${this.sirixInfo.sirixUri}/${this.dbName}/${this.resourceName}`, { params, headers: { Authorization: this.authData.access_token } });
+            let res = yield axios_1.default.delete(`${this.sirixInfo.sirixUri}/${this.dbName}/${this.resourceName}`, { params, headers: { Authorization: `Bearer ${this.authData.access_token}` } });
             if (res.status !== 204) {
                 console.error(res.status, res.data);
                 return false;

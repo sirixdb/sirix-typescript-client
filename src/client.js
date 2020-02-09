@@ -54,7 +54,7 @@ class Sirix {
     }
     delete() {
         return __awaiter(this, void 0, void 0, function* () {
-            let res = yield axios_1.default.delete(this.sirixInfo.sirixUri, { headers: { Authorization: this.authData.access_token } });
+            let res = yield axios_1.default.delete(this.sirixInfo.sirixUri, { headers: { Authorization: `Bearer ${this.authData.access_token}` } });
             if (res.status >= 400) {
                 console.error(res.status, res.data);
                 return false;

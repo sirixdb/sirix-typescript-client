@@ -29,7 +29,7 @@ export default class Resource {
       data,
       {
         headers: {
-          Authorization: this.authData.access_token,
+          Authorization: `Bearer ${this.authData.access_token}`,
           'Content-Type': contentType(this.type),
           'Accept': contentType(this.type)
         }
@@ -87,7 +87,7 @@ export default class Resource {
       `${this.sirixInfo.sirixUri}/${this.dbName}/${this.resourceName}`,
       {
         params: params,
-        headers: { Authorization: this.authData.access_token, 'Content-Type': contentType(this.type) }
+        headers: { Authorization: `Bearer ${this.authData.access_token}`, 'Content-Type': contentType(this.type) }
       }
     )
     if (res.status !== 200) {
@@ -106,7 +106,7 @@ export default class Resource {
       `${this.sirixInfo.sirixUri}/${this.dbName}/${this.resourceName}`,
       {
         params, headers: {
-          Authorization: this.authData.access_token, 'Content-Type': contentType(this.type)
+          Authorization: `Bearer ${this.authData.access_token}`, 'Content-Type': contentType(this.type)
         }
       }
     )
@@ -127,7 +127,7 @@ export default class Resource {
       {
         params: { nodeId, insert },
         headers: {
-          Authorization: this.authData.access_token, 'Content-Type': contentType(this.type)
+          Authorization: `Bearer ${this.authData.access_token}`, 'Content-Type': contentType(this.type)
         }
       })
     if (res.status !== 201) {
@@ -145,7 +145,7 @@ export default class Resource {
       params = { nodeId };
     }
     let res = await Axios.delete(`${this.sirixInfo.sirixUri}/${this.dbName}/${this.resourceName}`,
-      { params, headers: { Authorization: this.authData.access_token } }
+      { params, headers: { Authorization: `Bearer ${this.authData.access_token}` } }
     );
     if (res.status !== 204) {
       console.error(res.status, res.data);

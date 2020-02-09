@@ -61,7 +61,7 @@ export default class Sirix {
    */
   public async delete(): Promise<boolean> {
     let res = await Axios.delete(this.sirixInfo.sirixUri,
-      { headers: { Authorization: this.authData.access_token } });
+      { headers: { Authorization: `Bearer ${this.authData.access_token}` } });
     if (res.status >= 400) {
       console.error(res.status, res.data);
       return false;

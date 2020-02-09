@@ -24,7 +24,7 @@ export default class Database {
    */
   public delete(): Promise<boolean> {
     return Axios.delete(`${this.sirixInfo.sirixUri}/${this.name}`,
-      { headers: { Authorization: this.authData.access_token, 'Content-Type': contentType(this.type) } }
+      { headers: { Authorization: `Bearer ${this.authData.access_token}`, 'Content-Type': contentType(this.type) } }
     )
     .then(res => {
       if (res.status !== 204) {
