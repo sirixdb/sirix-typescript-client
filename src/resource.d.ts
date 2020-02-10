@@ -7,7 +7,6 @@ export default class Resource {
     private sirixInfo;
     private authData;
     constructor(dbName: string, resourceName: string, type: string, sirixInfo: SirixInfo, authData: AuthData);
-    private exists;
     create(data: string): Promise<boolean>;
     read(nodeId: number | null, revision: Revision | [Revision, Revision] | null, maxLevel?: number | null, withMetadata?: boolean): Promise<string | JSON>;
     updateById(nodeId: number, data: string, insert: Insert): Promise<boolean>;

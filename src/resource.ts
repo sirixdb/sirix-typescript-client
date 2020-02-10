@@ -15,12 +15,8 @@ export default class Resource {
     let db = sirixInfo.databaseInfo.filter(obj => obj.name === name);
     if (db.length > 0) {
       this.type = db[0].type;
-      if (name in db[0].resources) {
-        this.exists = true;
-      }
     }
   }
-  private exists: boolean = false;
   /**
    * create
    */
@@ -39,7 +35,7 @@ export default class Resource {
         console.error(res.status, res.data);
         return false;
       } else {
-        let db = this.sirixInfo.databaseInfo.filter(obj => obj.name === name)[0];
+        let db = this.sirixInfo.databaseInfo.filter(obj => obj.name === this.dbName)[0];
         db.resources.push(this.resourceName);
         return true;
       }
@@ -54,12 +50,6 @@ export default class Resource {
     maxLevel: number | null = null,
     withMetadata: boolean = false
   ): Promise<string | JSON> {
-    if (!this.exists) {
-      let created = await this.create("");
-      if (!created) {
-        return null;
-      }
-    }
     let params: ReadParams = {}
     if (nodeId) {
       params['nodeId'] = nodeId;
