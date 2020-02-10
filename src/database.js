@@ -27,8 +27,9 @@ class Database {
                 return false;
             }
             else {
-                this.getInfo();
-                return true;
+                return this.getInfo().then(() => {
+                    return true;
+                });
             }
         });
     }
@@ -57,8 +58,9 @@ class Database {
         })
             .then(res => {
             if (res.status === 201) {
-                this.getInfo();
-                return true;
+                return this.getInfo().then(() => {
+                    return true;
+                });
             }
             else {
                 console.error(res.status, res.data);

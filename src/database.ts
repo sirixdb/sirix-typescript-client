@@ -31,8 +31,9 @@ export default class Database {
         console.error(res.status, res.data);
         return false;
       } else {
-        this.getInfo();
-        return true;
+        return this.getInfo().then(() => {
+          return true;
+        });
       }
     });
   }
@@ -70,8 +71,9 @@ export default class Database {
       })
       .then(res => {
         if (res.status === 201) {
-          this.getInfo();
-          return true;
+          return this.getInfo().then(() => {
+            return true;
+          });
         } else {
           console.error(res.status, res.data);
           return false;
