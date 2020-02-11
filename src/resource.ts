@@ -141,7 +141,7 @@ export default class Resource {
       console.error(res.status, res.data);
       return false;
     } else {
-      let db = this.sirixInfo.databaseInfo.filter(obj => obj.name === name)[0];
+      let db = this.sirixInfo.databaseInfo.filter(obj => obj.name === this.dbName)[0];
       db.resources.splice(db.resources.findIndex(val => this.resourceName));
       return true;
     }
