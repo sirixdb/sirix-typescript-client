@@ -12,7 +12,7 @@ export default class Database {
    * ready
    */
   public ready(): Promise<boolean> {
-    let db = this.sirixInfo.databaseInfo.filter(obj => obj.name === name);
+    let db = this.sirixInfo.databaseInfo.filter(obj => obj.name === this.name);
     if (db.length > 0) {
       this.type = db[0].type;
     } else {
