@@ -43,7 +43,7 @@ class Resource {
         });
     }
     history() {
-        return axios_1.default.get(`${this.sirixInfo.sirixUri}/${this.dbName}/${this.resourceName}`, {
+        return axios_1.default.get(`${this.sirixInfo.sirixUri}/${this.dbName}/${this.resourceName}/history`, {
             headers: { Authorization: `Bearer ${this.authData.access_token}` }
         }).then(res => {
             if (res.status !== 200) {

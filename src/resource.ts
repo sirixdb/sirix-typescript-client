@@ -46,7 +46,7 @@ export default class Resource {
    */
   public history(): Promise<Commit[]> {
     return Axios.get(
-      `${this.sirixInfo.sirixUri}/${this.dbName}/${this.resourceName}`,
+      `${this.sirixInfo.sirixUri}/${this.dbName}/${this.resourceName}/history`,
       {
         headers: { Authorization: `Bearer ${this.authData.access_token}` }
       }
