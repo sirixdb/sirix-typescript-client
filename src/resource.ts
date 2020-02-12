@@ -2,7 +2,7 @@ import Axios from "axios";
 
 import { contentType, Insert } from './utils';
 
-import { SirixInfo, AuthData, Revision, ReadParams } from './info'
+import { SirixInfo, AuthData, Revision, ReadParams, Commit } from './info'
 
 export default class Resource {
   constructor(
@@ -40,6 +40,24 @@ export default class Resource {
         return true;
       }
     });
+  }
+  /**
+   * history
+   */
+  public history(): Promise<Commit[]> {
+    return Axios.get(
+      `${this.sirixInfo.sirixUri}/${this.dbName}/${this.resourceName}`,
+      {
+        headers: { Authorization: `Bearer ${this.authData.access_token}` }
+      }
+    ).then(res => {
+      if (res.status !== 200) {
+        console.error(res.status, res.data);
+        return null;
+      } else {
+        return res.data["history"];
+      }
+    })
   }
   /**
    * read

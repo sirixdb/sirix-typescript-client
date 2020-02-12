@@ -42,6 +42,19 @@ class Resource {
             }
         });
     }
+    history() {
+        return axios_1.default.get(`${this.sirixInfo.sirixUri}/${this.dbName}/${this.resourceName}`, {
+            headers: { Authorization: `Bearer ${this.authData.access_token}` }
+        }).then(res => {
+            if (res.status !== 200) {
+                console.error(res.status, res.data);
+                return null;
+            }
+            else {
+                return res.data["history"];
+            }
+        });
+    }
     read(nodeId, revision, maxLevel = null, withMetadata = false) {
         return __awaiter(this, void 0, void 0, function* () {
             let params = {};

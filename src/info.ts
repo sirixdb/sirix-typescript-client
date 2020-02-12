@@ -40,4 +40,11 @@ interface ReadParams {
   "end-revision-timestamp"?: string
 }
 
-export { SirixInfo, DatabaseInfo, LoginInfo, AuthData, Revision, ReadParams }
+interface Commit {
+  revisionTimestamp: string,
+  revision: number,
+  author: string,
+  commitMessage: string,
+}
+
+export { SirixInfo, DatabaseInfo, LoginInfo, AuthData, Revision, ReadParams, Commit }
