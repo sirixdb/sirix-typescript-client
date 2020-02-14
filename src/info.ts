@@ -59,10 +59,10 @@ interface MetaNode {
   key?:
     | string; // if metadata.type === "OBJECT_KEY"
   value:
-    | Node[]  // if metadata.type === "OBJECT" or "ARRAY" alternatively
+    | MetaNode[]  // if metadata.type === "OBJECT" or "ARRAY" alternatively
     | {}      // if can be an empty object, if metadata.childCount === 0
     | []      // or an empty array, depending on whether type is "OBJECT" or "ARRAY"
-    | Node    // if metadata.type === "OBJECT_KEY"
+    | MetaNode    // if metadata.type === "OBJECT_KEY"
     | string  // if metadata.type === "OBJECT_STRING_VALUE" or "STRING_VALUE"
     | number  // if metadata.type === "OBJECT_NUMBER_VALUE" or "NUMBER_VALUE"
     | boolean // if metadata.type === "OBJECT_BOOLEAN_VALUE" or "BOOLEAN_VALUE"

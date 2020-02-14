@@ -50,6 +50,6 @@ interface Metadata {
 interface MetaNode {
     metadata: Metadata;
     key?: string;
-    value: Node[] | {} | [] | Node | string | number | boolean | null;
+    value: MetaNode[] | {} | [] | MetaNode | string | number | boolean | null;
 }
 export { SirixInfo, DatabaseInfo, LoginInfo, AuthData, Revision, ReadParams, Commit, MetaNode };
