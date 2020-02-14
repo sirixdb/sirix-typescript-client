@@ -40,10 +40,22 @@ interface Commit {
     author: string;
     commitMessage: string;
 }
+declare enum NodeType {
+    OBJECT = "OBJECT",
+    ARRAY = "ARRAY",
+    OBJECT_KEY = "OBJECT_KEY",
+    OBJECT_STRING_VALUE = "OBJECT_STRING_VALUE",
+    STRING_VALUE = "STRING_VALUE",
+    OBJECT_NUMBER_VALUE = "OBJECT_NUMBER_VALUE",
+    NUMBER_VALUE = "NUMBER_VALUE",
+    OBJECT_BOOLEAN_VALUE = "OBJECT_BOOLEAN_VALUE",
+    OBJECT_NULL_VALUE = "OBJECT_NULL_VALUE",
+    NULL_VALUE = "NULL_VALUE"
+}
 interface Metadata {
     nodeKey: number;
     hash: number;
-    type: string;
+    type: NodeType;
     descendantCount?: number;
     childCount?: number;
 }

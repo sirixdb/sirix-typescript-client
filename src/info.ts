@@ -47,26 +47,40 @@ interface Commit {
   commitMessage: string,
 }
 
+enum NodeType {
+  OBJECT = "OBJECT",
+  ARRAY = "ARRAY",
+  OBJECT_KEY = "OBJECT_KEY",
+  OBJECT_STRING_VALUE = "OBJECT_STRING_VALUE",
+  STRING_VALUE = "STRING_VALUE",
+  OBJECT_NUMBER_VALUE = "OBJECT_NUMBER_VALUE",
+  NUMBER_VALUE = "NUMBER_VALUE",
+  OBJECT_BOOLEAN_VALUE = "OBJECT_BOOLEAN_VALUE",
+  OBJECT_NULL_VALUE = "OBJECT_NULL_VALUE",
+  NULL_VALUE = "NULL_VALUE"
+}
+
 interface Metadata {
   nodeKey: number;
   hash: number;
-  type: string;
-  descendantCount?: number; // only for type "OBJECT" and "ARRAY"
-  childCount?: number; // only for type "OBJECT" and "ARRAY"
+  type: NodeType;
+  descendantCount?: number; // only for type OBJECT and ARRAY
+  childCount?: number; // only for type OBJECT and ARRAY
 }
+
 interface MetaNode {
   metadata: Metadata;
   key?:
-    | string; // if metadata.type === "OBJECT_KEY"
+    | string; // if metadata.type === OBJECT_KEY
   value:
-    | MetaNode[]  // if metadata.type === "OBJECT" or "ARRAY" alternatively
+    | MetaNode[]  // if metadata.type === OBJECT or ARRAY alternatively
     | {}      // if can be an empty object, if metadata.childCount === 0
-    | []      // or an empty array, depending on whether type is "OBJECT" or "ARRAY"
-    | MetaNode    // if metadata.type === "OBJECT_KEY"
-    | string  // if metadata.type === "OBJECT_STRING_VALUE" or "STRING_VALUE"
-    | number  // if metadata.type === "OBJECT_NUMBER_VALUE" or "NUMBER_VALUE"
-    | boolean // if metadata.type === "OBJECT_BOOLEAN_VALUE" or "BOOLEAN_VALUE"
-    | null;   // if metadata.type === "OBJECT_NULL_VALUE" or "NULL_VALUE"
+    | []      // or an empty array, depending on whether type is OBJECT or ARRAY
+    | MetaNode    // if metadata.type === OBJECT_KEY
+    | string  // if metadata.type === OBJECT_STRING_VALUE or STRING_VALUE
+    | number  // if metadata.type === OBJECT_NUMBER_VALUE or NUMBER_VALUE
+    | boolean // if metadata.type === OBJECT_BOOLEAN_VALUE or BOOLEAN_VALUE
+    | null;   // if metadata.type === OBJECT_NULL_VALUE or NULL_VALUE
 }
 
 export { SirixInfo, DatabaseInfo, LoginInfo, AuthData, Revision, ReadParams, Commit, MetaNode }
