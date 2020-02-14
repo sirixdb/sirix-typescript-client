@@ -10,6 +10,7 @@ var NodeType;
     NodeType["OBJECT_NUMBER_VALUE"] = "OBJECT_NUMBER_VALUE";
     NodeType["NUMBER_VALUE"] = "NUMBER_VALUE";
     NodeType["OBJECT_BOOLEAN_VALUE"] = "OBJECT_BOOLEAN_VALUE";
+    NodeType["BOOLEAN_VALUE"] = "BOOLEAN_VALUE";
     NodeType["OBJECT_NULL_VALUE"] = "OBJECT_NULL_VALUE";
     NodeType["NULL_VALUE"] = "NULL_VALUE";
 })(NodeType || (NodeType = {}));
