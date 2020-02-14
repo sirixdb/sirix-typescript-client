@@ -13,3 +13,4 @@ var NodeType;
     NodeType["OBJECT_NULL_VALUE"] = "OBJECT_NULL_VALUE";
     NodeType["NULL_VALUE"] = "NULL_VALUE";
 })(NodeType || (NodeType = {}));
+exports.NodeType = NodeType;

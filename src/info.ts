@@ -83,4 +83,4 @@ interface MetaNode {
     | null;   // if metadata.type === OBJECT_NULL_VALUE or NULL_VALUE
 }
 
-export { SirixInfo, DatabaseInfo, LoginInfo, AuthData, Revision, ReadParams, Commit, MetaNode }
+export { SirixInfo, DatabaseInfo, LoginInfo, AuthData, Revision, ReadParams, Commit, MetaNode, NodeType }

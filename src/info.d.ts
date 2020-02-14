@@ -64,4 +64,4 @@ interface MetaNode {
     key?: string;
     value: MetaNode[] | {} | [] | MetaNode | string | number | boolean | null;
 }
-export { SirixInfo, DatabaseInfo, LoginInfo, AuthData, Revision, ReadParams, Commit, MetaNode };
+export { SirixInfo, DatabaseInfo, LoginInfo, AuthData, Revision, ReadParams, Commit, MetaNode, NodeType };
