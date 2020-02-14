@@ -55,38 +55,12 @@ class Resource {
             }
         });
     }
-    read(nodeId, revision, maxLevel = null, withMetadata = false) {
-        return __awaiter(this, void 0, void 0, function* () {
-            let params = {};
-            if (nodeId) {
-                params['nodeId'] = nodeId;
-            }
-            if (maxLevel) {
-                params['maxLevel'] = maxLevel;
-            }
-            if (withMetadata) {
-                params['withMetadata'] = true;
-            }
-            if (revision) {
-                if (typeof revision === 'number') {
-                    params['revision'] = revision;
-                }
-                else if (revision instanceof Date) {
-                    params['revision-timestamp'] = revision.toISOString();
-                }
-                else if (typeof revision[0] === 'number' && typeof revision[1] === 'number') {
-                    params['start-revision'] = revision[0];
-                    params['end-revision'] = revision[1];
-                }
-                else if (revision[0] instanceof Date && revision[1] instanceof Date) {
-                    params['start-revision-timestamp'] = revision[0].toISOString();
-                    params['end-revision-timestamp'] = revision[1].toISOString();
-                }
-            }
-            let res = yield axios_1.default.get(`${this.sirixInfo.sirixUri}/${this.dbName}/${this.resourceName}`, {
-                params: params,
-                headers: { Authorization: `Bearer ${this.authData.access_token}`, 'Content-Type': utils_1.contentType(this.type) }
-            });
+    read(inputParams) {
+        const params = this.readParams(inputParams);
+        return axios_1.default.get(`${this.sirixInfo.sirixUri}/${this.dbName}/${this.resourceName}`, {
+            params: params,
+            headers: { Authorization: `Bearer ${this.authData.access_token}`, 'Content-Type': utils_1.contentType(this.type) }
+        }).then(res => {
             if (res.status !== 200) {
                 console.error(res.status, res.data);
                 return null;
@@ -95,6 +69,49 @@ class Resource {
                 return res.data;
             }
         });
+    }
+    readWithMetadata(inputParams) {
+        const params = this.readParams(inputParams);
+        params["withMetadata"] = true;
+        return axios_1.default.get(`${this.sirixInfo.sirixUri}/${this.dbName}/${this.resourceName}`, {
+            params: params,
+            headers: { Authorization: `Bearer ${this.authData.access_token}`, 'Content-Type': utils_1.contentType(this.type) }
+        }).then(res => {
+            if (res.status !== 200) {
+                console.error(res.status, res.data);
+                return null;
+            }
+            else {
+                return res.data;
+            }
+        });
+    }
+    readParams(inputParams) {
+        let { nodeId, revision, maxLevel } = Object.assign({}, inputParams);
+        let params = {};
+        if (nodeId) {
+            params['nodeId'] = nodeId;
+        }
+        if (maxLevel) {
+            params['maxLevel'] = maxLevel;
+        }
+        if (revision) {
+            if (typeof revision === 'number') {
+                params['revision'] = revision;
+            }
+            else if (revision instanceof Date) {
+                params['revision-timestamp'] = revision.toISOString();
+            }
+            else if (typeof revision[0] === 'number' && typeof revision[1] === 'number') {
+                params['start-revision'] = revision[0];
+                params['end-revision'] = revision[1];
+            }
+            else if (revision[0] instanceof Date && revision[1] instanceof Date) {
+                params['start-revision-timestamp'] = revision[0].toISOString();
+                params['end-revision-timestamp'] = revision[1].toISOString();
+            }
+        }
+        return params;
     }
     updateById(nodeId, data, insert) {
         return __awaiter(this, void 0, void 0, function* () {

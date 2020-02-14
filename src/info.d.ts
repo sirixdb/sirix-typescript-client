@@ -40,4 +40,16 @@ interface Commit {
     author: string;
     commitMessage: string;
 }
-export { SirixInfo, DatabaseInfo, LoginInfo, AuthData, Revision, ReadParams, Commit };
+interface Metadata {
+    nodeKey: number;
+    hash: number;
+    type: string;
+    descendantCount?: number;
+    childCount?: number;
+}
+interface MetaNode {
+    metadata: Metadata;
+    key?: string;
+    value: Node[] | {} | [] | Node | string | number | boolean | null;
+}
+export { SirixInfo, DatabaseInfo, LoginInfo, AuthData, Revision, ReadParams, Commit, MetaNode };

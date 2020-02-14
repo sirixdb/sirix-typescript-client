@@ -2,7 +2,7 @@ import Axios from "axios";
 
 import { contentType, Insert } from './utils';
 
-import { SirixInfo, AuthData, Revision, ReadParams, Commit } from './info'
+import { SirixInfo, AuthData, Revision, ReadParams, Commit, MetaNode } from './info'
 
 export default class Resource {
   constructor(
@@ -62,21 +62,64 @@ export default class Resource {
   /**
    * read
    */
-  public async read(
-    nodeId: number | null,
-    revision: Revision | [Revision, Revision] | null,
-    maxLevel: number | null = null,
-    withMetadata: boolean = false
-  ): Promise<string | JSON> {
+  public read(inputParams: {
+    nodeId: number,
+    revision: Revision | [Revision, Revision],
+    maxLevel: number
+  }): Promise<string | JSON> {
+    const params = this.readParams(inputParams);
+    return Axios.get(
+      `${this.sirixInfo.sirixUri}/${this.dbName}/${this.resourceName}`,
+      {
+        params: params,
+        headers: { Authorization: `Bearer ${this.authData.access_token}`, 'Content-Type': contentType(this.type) }
+      }
+    ).then(res => {
+      if (res.status !== 200) {
+        console.error(res.status, res.data);
+        return null;
+      } else {
+        return res.data;
+      }
+    })
+  }
+  /**
+   * readWithMetadata
+   */
+  public readWithMetadata(inputParams: {
+    nodeId: number,
+    revision: Revision | [Revision, Revision],
+    maxLevel: number
+  }): Promise<MetaNode> {
+    const params = this.readParams(inputParams);
+    params["withMetadata"] = true;
+    return Axios.get(
+      `${this.sirixInfo.sirixUri}/${this.dbName}/${this.resourceName}`,
+      {
+        params: params,
+        headers: { Authorization: `Bearer ${this.authData.access_token}`, 'Content-Type': contentType(this.type) }
+      }
+    ).then(res => {
+      if (res.status !== 200) {
+        console.error(res.status, res.data);
+        return null;
+      } else {
+        return res.data;
+      }
+    })
+  }
+  private readParams(inputParams: {
+    nodeId: number,
+    revision: Revision | [Revision, Revision],
+    maxLevel: number
+  }) {
+    let {nodeId, revision, maxLevel} = {...inputParams};
     let params: ReadParams = {}
     if (nodeId) {
       params['nodeId'] = nodeId;
     }
     if (maxLevel) {
       params['maxLevel'] = maxLevel;
-    }
-    if (withMetadata) {
-      params['withMetadata'] = true;
     }
     if (revision) {
       if (typeof revision === 'number') {
@@ -91,19 +134,7 @@ export default class Resource {
         params['end-revision-timestamp'] = revision[1].toISOString();
       }
     }
-    let res = await Axios.get(
-      `${this.sirixInfo.sirixUri}/${this.dbName}/${this.resourceName}`,
-      {
-        params: params,
-        headers: { Authorization: `Bearer ${this.authData.access_token}`, 'Content-Type': contentType(this.type) }
-      }
-    )
-    if (res.status !== 200) {
-      console.error(res.status, res.data);
-      return null;
-    } else {
-      return res.data;
-    }
+    return params;
   }
   /**
    * updateById
