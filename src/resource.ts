@@ -160,7 +160,7 @@ export default class Resource {
       return false;
     } else {
       let db = this.sirixInfo.databaseInfo.filter(obj => obj.name === this.dbName)[0];
-      db.resources.splice(db.resources.findIndex(val => this.resourceName));
+      db.resources.splice(db.resources.findIndex(val => val === this.resourceName));
       return true;
     }
   }
