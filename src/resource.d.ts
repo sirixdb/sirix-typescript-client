@@ -10,14 +10,14 @@ export default class Resource {
     create(data: string): Promise<boolean>;
     history(): Promise<Commit[]>;
     read(inputParams: {
-        nodeId: number;
-        revision: Revision | [Revision, Revision];
-        maxLevel: number;
+        nodeId?: number;
+        revision?: Revision | [Revision, Revision];
+        maxLevel?: number;
     }): Promise<string | JSON>;
     readWithMetadata(inputParams: {
-        nodeId: number;
-        revision: Revision | [Revision, Revision];
-        maxLevel: number;
+        nodeId?: number;
+        revision?: Revision | [Revision, Revision];
+        maxLevel?: number;
     }): Promise<MetaNode>;
     private readParams;
     updateById(nodeId: number, data: string, insert: Insert): Promise<boolean>;

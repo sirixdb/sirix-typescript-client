@@ -63,9 +63,9 @@ export default class Resource {
    * read
    */
   public read(inputParams: {
-    nodeId: number,
-    revision: Revision | [Revision, Revision],
-    maxLevel: number
+    nodeId?: number,
+    revision?: Revision | [Revision, Revision],
+    maxLevel?: number
   }): Promise<string | JSON> {
     const params = this.readParams(inputParams);
     return Axios.get(
@@ -87,9 +87,9 @@ export default class Resource {
    * readWithMetadata
    */
   public readWithMetadata(inputParams: {
-    nodeId: number,
-    revision: Revision | [Revision, Revision],
-    maxLevel: number
+    nodeId?: number,
+    revision?: Revision | [Revision, Revision],
+    maxLevel?: number
   }): Promise<MetaNode> {
     const params = this.readParams(inputParams);
     params["withMetadata"] = true;
@@ -109,9 +109,9 @@ export default class Resource {
     })
   }
   private readParams(inputParams: {
-    nodeId: number,
-    revision: Revision | [Revision, Revision],
-    maxLevel: number
+    nodeId?: number,
+    revision?: Revision | [Revision, Revision],
+    maxLevel?: number
   }) {
     let {nodeId, revision, maxLevel} = {...inputParams};
     let params: ReadParams = {}
