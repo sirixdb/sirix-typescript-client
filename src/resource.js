@@ -122,7 +122,7 @@ class Resource {
                 }
             });
             if (head.status !== 200) {
-                console.log(head.status, head.data);
+                console.error(head.status, head.data);
                 return null;
             }
             let ETag = head.headers['ETag'];
@@ -144,20 +144,42 @@ class Resource {
             return true;
         });
     }
-    delete(nodeId) {
+    deleteById(nodeId) {
         return __awaiter(this, void 0, void 0, function* () {
             let params = {};
             if (nodeId !== null) {
                 params = { nodeId };
             }
-            let res = yield axios_1.default.delete(`${this.sirixInfo.sirixUri}/${this.dbName}/${this.resourceName}`, { params, headers: { Authorization: `Bearer ${this.authData.access_token}` } });
+            let headers = { Authorization: `Bearer ${this.authData.access_token}` };
+            let head = yield axios_1.default.head(`${this.sirixInfo.sirixUri}/${this.dbName}/${this.resourceName}`, { params, headers });
+            if (head.status !== 200) {
+                console.error(head.status, head.data);
+                return false;
+            }
+            return this.delete(nodeId, head.headers['ETag']);
+        });
+    }
+    delete(nodeId, ETag) {
+        return __awaiter(this, void 0, void 0, function* () {
+            let params = {};
+            let headers = {};
+            if (nodeId != null) {
+                params = { nodeId };
+                headers = { Authorization: `Bearer ${this.authData.access_token}`, ETag };
+            }
+            else {
+                headers = { Authorization: `Bearer ${this.authData.access_token}` };
+            }
+            let res = yield axios_1.default.delete(`${this.sirixInfo.sirixUri}/${this.dbName}/${this.resourceName}`, { params, headers });
             if (res.status !== 204) {
                 console.error(res.status, res.data);
                 return false;
             }
             else {
-                let db = this.sirixInfo.databaseInfo.filter(obj => obj.name === this.dbName)[0];
-                db.resources.splice(db.resources.findIndex(val => val === this.resourceName));
+                if (nodeId === null) {
+                    let db = this.sirixInfo.databaseInfo.filter(obj => obj.name === this.dbName)[0];
+                    db.resources.splice(db.resources.findIndex(val => val === this.resourceName));
+                }
                 return true;
             }
         });

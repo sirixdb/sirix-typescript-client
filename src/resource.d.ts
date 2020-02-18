@@ -22,5 +22,6 @@ export default class Resource {
     private readParams;
     updateById(nodeId: number, data: string, insert: Insert): Promise<boolean>;
     update(nodeId: number, ETag: string, data: string, insert: Insert): Promise<boolean>;
-    delete(nodeId: number | null): Promise<boolean>;
+    deleteById(nodeId: number | null): Promise<boolean>;
+    delete(nodeId: number | null, ETag: number): Promise<boolean>;
 }

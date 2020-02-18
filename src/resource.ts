@@ -113,7 +113,7 @@ export default class Resource {
     revision?: Revision | [Revision, Revision],
     maxLevel?: number
   }) {
-    let {nodeId, revision, maxLevel} = {...inputParams};
+    let { nodeId, revision, maxLevel } = { ...inputParams };
     let params: ReadParams = {}
     if (nodeId) {
       params['nodeId'] = nodeId;
@@ -150,7 +150,7 @@ export default class Resource {
       }
     )
     if (head.status !== 200) {
-      console.log(head.status, head.data);
+      console.error(head.status, head.data);
       return null;
     }
     let ETag = head.headers['ETag'];
@@ -176,22 +176,46 @@ export default class Resource {
     return true;
   }
   /**
-   * delete
+   * deleteById
    */
-  public async delete(nodeId: number | null): Promise<boolean> {
+  public async deleteById(nodeId: number | null): Promise<boolean> {
     let params = {}
     if (nodeId !== null) {
       params = { nodeId };
     }
+    let headers = { Authorization: `Bearer ${this.authData.access_token}` };
+    let head = await Axios.head(`${this.sirixInfo.sirixUri}/${this.dbName}/${this.resourceName}`,
+      { params, headers }
+    );
+    if (head.status !== 200) {
+      console.error(head.status, head.data)
+      return false;
+    }
+    return this.delete(nodeId, head.headers['ETag'])
+  }
+  /**
+   * delete
+   */
+  public async delete(nodeId: number | null, ETag: number): Promise<boolean> {
+    let params = {}
+    let headers = {}
+    if (nodeId != null) {
+      params = { nodeId }
+      headers = { Authorization: `Bearer ${this.authData.access_token}`, ETag };
+    } else {
+      headers = { Authorization: `Bearer ${this.authData.access_token}` }
+    }
     let res = await Axios.delete(`${this.sirixInfo.sirixUri}/${this.dbName}/${this.resourceName}`,
-      { params, headers: { Authorization: `Bearer ${this.authData.access_token}` } }
+      { params, headers }
     );
     if (res.status !== 204) {
       console.error(res.status, res.data);
       return false;
     } else {
-      let db = this.sirixInfo.databaseInfo.filter(obj => obj.name === this.dbName)[0];
-      db.resources.splice(db.resources.findIndex(val => val === this.resourceName));
+      if (nodeId === null) {
+        let db = this.sirixInfo.databaseInfo.filter(obj => obj.name === this.dbName)[0];
+        db.resources.splice(db.resources.findIndex(val => val === this.resourceName));
+      }
       return true;
     }
   }
