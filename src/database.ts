@@ -50,7 +50,6 @@ export default class Database {
   public getInfo(): Promise<DatabaseInfo[]> {
     return Axios.get(this.sirixInfo.sirixUri,
       {
-        params: { withResources: true },
         headers: {
           Accept: 'application/json',
           Authorization: `Bearer ${this.authData.access_token}`
@@ -60,7 +59,8 @@ export default class Database {
           console.error(res.status, res.data);
           return null;
         }
-        this.sirixInfo.databaseInfo.splice(0, this.sirixInfo.databaseInfo.length, ...res.data["databases"]);
+        let db = this.sirixInfo.databaseInfo.find(obj => obj.name === this.name);
+        db = Object.assign(db, res.data["resources"])
         return this.sirixInfo.databaseInfo;
       });
   }
