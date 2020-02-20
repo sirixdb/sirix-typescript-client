@@ -150,7 +150,7 @@ class Resource {
             if (nodeId !== null) {
                 params = { nodeId };
             }
-            let headers = { Authorization: `Bearer ${this.authData.access_token}` };
+            let headers = { Authorization: `Bearer ${this.authData.access_token}`, Accept: utils_1.contentType(this.type) };
             let head = yield axios_1.default.head(`${this.sirixInfo.sirixUri}/${this.dbName}/${this.resourceName}`, { params, headers });
             if (head.status !== 200) {
                 console.error(head.status, head.data);

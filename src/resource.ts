@@ -183,7 +183,7 @@ export default class Resource {
     if (nodeId !== null) {
       params = { nodeId };
     }
-    let headers = { Authorization: `Bearer ${this.authData.access_token}` };
+    let headers = { Authorization: `Bearer ${this.authData.access_token}`, Accept: contentType(this.type) };
     let head = await Axios.head(`${this.sirixInfo.sirixUri}/${this.dbName}/${this.resourceName}`,
       { params, headers }
     );
