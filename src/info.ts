@@ -47,6 +47,37 @@ interface Commit {
   commitMessage: string,
 }
 
+interface DiffResponse {
+  database: string,
+  resource: string,
+  "old-revision": number,
+  "new-revision": number,
+  diffs: Diff[]
+}
+
+interface Diff {
+  insert?: {
+    oldNodeKey: number,
+    newNodeKey: number,
+    insertPositionNodeKey: number,
+    insertPosition: string,
+    type: string,
+    data: string
+  },
+  replace?: {
+    oldNodeKey: number,
+    newNodeKey: number,
+    type: string,
+    data: string
+  },
+  update?: {
+    nodeKey: number,
+    type: string,
+    value: string | number | boolean
+  },
+  delete?: number
+}
+
 enum NodeType {
   OBJECT = "OBJECT",
   ARRAY = "ARRAY",
@@ -72,16 +103,28 @@ interface Metadata {
 interface MetaNode {
   metadata: Metadata;
   key?:
-    | string; // if metadata.type === OBJECT_KEY
+  | string; // if metadata.type === OBJECT_KEY
   value:
-    | MetaNode[]  // if metadata.type === OBJECT or ARRAY alternatively
-    | {}      // if can be an empty object, if metadata.childCount === 0
-    | []      // or an empty array, depending on whether type is OBJECT or ARRAY
-    | MetaNode    // if metadata.type === OBJECT_KEY
-    | string  // if metadata.type === OBJECT_STRING_VALUE or STRING_VALUE
-    | number  // if metadata.type === OBJECT_NUMBER_VALUE or NUMBER_VALUE
-    | boolean // if metadata.type === OBJECT_BOOLEAN_VALUE or BOOLEAN_VALUE
-    | null;   // if metadata.type === OBJECT_NULL_VALUE or NULL_VALUE
+  | MetaNode[]  // if metadata.type === OBJECT or ARRAY alternatively
+  | {}      // if can be an empty object, if metadata.childCount === 0
+  | []      // or an empty array, depending on whether type is OBJECT or ARRAY
+  | MetaNode    // if metadata.type === OBJECT_KEY
+  | string  // if metadata.type === OBJECT_STRING_VALUE or STRING_VALUE
+  | number  // if metadata.type === OBJECT_NUMBER_VALUE or NUMBER_VALUE
+  | boolean // if metadata.type === OBJECT_BOOLEAN_VALUE or BOOLEAN_VALUE
+  | null;   // if metadata.type === OBJECT_NULL_VALUE or NULL_VALUE
 }
 
-export { SirixInfo, DatabaseInfo, LoginInfo, AuthData, Revision, ReadParams, Commit, MetaNode, NodeType }
+export {
+  SirixInfo,
+  DatabaseInfo,
+  LoginInfo,
+  AuthData,
+  Revision,
+  ReadParams,
+  Commit,
+  DiffResponse,
+  Diff,
+  MetaNode,
+  NodeType
+}

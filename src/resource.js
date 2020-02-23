@@ -55,6 +55,33 @@ class Resource {
             }
         });
     }
+    diff(firstRevision, secondRevision, inputParams) {
+        let params = {};
+        if (inputParams.nodeId) {
+            params = Object.assign(Object.assign({}, params), { startNodeKey: inputParams.nodeId });
+        }
+        if (inputParams.maxLevel) {
+            params = Object.assign(Object.assign({}, params), { maxDepth: inputParams.maxLevel });
+        }
+        if (typeof firstRevision === "number" && typeof secondRevision === "number") {
+            params = Object.assign(Object.assign({}, params), { "first-revision": firstRevision, "second-revision": secondRevision });
+        }
+        else if (firstRevision instanceof Date && secondRevision instanceof Date) {
+            params = Object.assign(Object.assign({}, params), { "first-revision": firstRevision.toISOString(), "second-revision": secondRevision.toISOString() });
+        }
+        return axios_1.default.get(`${this.sirixInfo.sirixUri}/${this.dbName}/${this.resourceName}/diff`, {
+            params,
+            headers: { Authorization: `Bearer ${this.authData.access_token}` }
+        }).then(res => {
+            if (res.status !== 200) {
+                console.error(res.status, res.data);
+                return null;
+            }
+            else {
+                return res.data;
+            }
+        });
+    }
     read(inputParams) {
         const params = this.readParams(inputParams);
         return axios_1.default.get(`${this.sirixInfo.sirixUri}/${this.dbName}/${this.resourceName}`, {

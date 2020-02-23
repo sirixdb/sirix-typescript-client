@@ -40,6 +40,35 @@ interface Commit {
     author: string;
     commitMessage: string;
 }
+interface DiffResponse {
+    database: string;
+    resource: string;
+    "old-revision": number;
+    "new-revision": number;
+    diffs: Diff[];
+}
+interface Diff {
+    insert?: {
+        oldNodeKey: number;
+        newNodeKey: number;
+        insertPositionNodeKey: number;
+        insertPosition: string;
+        type: string;
+        data: string;
+    };
+    replace?: {
+        oldNodeKey: number;
+        newNodeKey: number;
+        type: string;
+        data: string;
+    };
+    update?: {
+        nodeKey: number;
+        type: string;
+        value: string | number | boolean;
+    };
+    delete?: number;
+}
 declare enum NodeType {
     OBJECT = "OBJECT",
     ARRAY = "ARRAY",
@@ -65,4 +94,4 @@ interface MetaNode {
     key?: string;
     value: MetaNode[] | {} | [] | MetaNode | string | number | boolean | null;
 }
-export { SirixInfo, DatabaseInfo, LoginInfo, AuthData, Revision, ReadParams, Commit, MetaNode, NodeType };
+export { SirixInfo, DatabaseInfo, LoginInfo, AuthData, Revision, ReadParams, Commit, DiffResponse, Diff, MetaNode, NodeType };

@@ -1,5 +1,5 @@
 import { Insert } from './utils';
-import { SirixInfo, AuthData, Revision, Commit, MetaNode } from './info';
+import { SirixInfo, AuthData, Revision, Commit, MetaNode, DiffResponse } from './info';
 export default class Resource {
     private dbName;
     private resourceName;
@@ -9,6 +9,10 @@ export default class Resource {
     constructor(dbName: string, resourceName: string, type: string, sirixInfo: SirixInfo, authData: AuthData);
     create(data: string): Promise<boolean>;
     history(): Promise<Commit[]>;
+    diff(firstRevision: Revision, secondRevision: Revision, inputParams: {
+        nodeId?: number;
+        maxLevel?: number;
+    }): Promise<DiffResponse>;
     read(inputParams: {
         nodeId?: number;
         revision?: Revision | [Revision, Revision];

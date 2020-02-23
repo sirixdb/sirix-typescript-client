@@ -2,7 +2,7 @@ import Axios from "axios";
 
 import { contentType, Insert } from './utils';
 
-import { SirixInfo, AuthData, Revision, ReadParams, Commit, MetaNode } from './info'
+import { SirixInfo, AuthData, Revision, ReadParams, Commit, MetaNode, DiffResponse } from './info'
 
 export default class Resource {
   constructor(
@@ -56,6 +56,43 @@ export default class Resource {
         return null;
       } else {
         return res.data["history"];
+      }
+    })
+  }
+  /**
+   * diff
+   */
+  public diff(firstRevision: Revision, secondRevision: Revision, inputParams: {
+    nodeId?: number,
+    maxLevel?: number
+  }): Promise<DiffResponse> {
+    let params = {}
+    if (inputParams.nodeId) {
+      params = { ...params, startNodeKey: inputParams.nodeId };
+    }
+    if (inputParams.maxLevel) {
+      params = { ...params, maxDepth: inputParams.maxLevel };
+    }
+    if (typeof firstRevision === "number" && typeof secondRevision === "number") {
+      params = { ...params, "first-revision": firstRevision, "second-revision": secondRevision }
+    } else if (firstRevision instanceof Date && secondRevision instanceof Date) {
+      params = {
+        ...params,
+        "first-revision": firstRevision.toISOString(),
+        "second-revision": secondRevision.toISOString()
+      }
+    }
+    return Axios.get(`${this.sirixInfo.sirixUri}/${this.dbName}/${this.resourceName}/diff`,
+      {
+        params,
+        headers: { Authorization: `Bearer ${this.authData.access_token}` }
+      }
+    ).then(res => {
+      if (res.status !== 200) {
+        console.error(res.status, res.data);
+        return null;
+      } else {
+        return res.data;
       }
     })
   }
