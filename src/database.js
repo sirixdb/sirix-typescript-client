@@ -28,7 +28,7 @@ class Database {
                 return false;
             }
             else {
-                this.sirixInfo.databaseInfo.filter(db => {
+                this.sirixInfo.databaseInfo = this.sirixInfo.databaseInfo.filter(db => {
                     return db.name === this.name;
                 });
                 return true;
