@@ -9,6 +9,6 @@ export default class Database {
     ready(): Promise<boolean>;
     delete(): Promise<boolean>;
     resource(name: string): Resource;
-    getInfo(): Promise<DatabaseInfo[]>;
+    getInfo(withResources?: boolean): Promise<DatabaseInfo[]>;
     private create;
 }

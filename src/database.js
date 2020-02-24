@@ -37,7 +37,11 @@ class Database {
     resource(name) {
         return new resource_1.default(this.name, name, this.type, this.sirixInfo, this.authData);
     }
-    getInfo() {
+    getInfo(withResources = false) {
+        let params = {};
+        if (withResources) {
+            params = { withResources };
+        }
         return axios_1.default.get(this.sirixInfo.sirixUri, {
             headers: {
                 Accept: 'application/json',
@@ -59,7 +63,7 @@ class Database {
         })
             .then(res => {
             if (res.status === 201) {
-                return this.getInfo().then(() => {
+                return this.getInfo(true).then(() => {
                     return true;
                 });
             }

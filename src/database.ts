@@ -27,16 +27,16 @@ export default class Database {
     return Axios.delete(`${this.sirixInfo.sirixUri}/${this.name}`,
       { headers: { Authorization: `Bearer ${this.authData.access_token}`, 'Content-Type': contentType(this.type) } }
     )
-    .then(res => {
-      if (res.status !== 204) {
-        console.error(res.status, res.data);
-        return false;
-      } else {
-        return this.getInfo().then(() => {
-          return true;
-        });
-      }
-    });
+      .then(res => {
+        if (res.status !== 204) {
+          console.error(res.status, res.data);
+          return false;
+        } else {
+          return this.getInfo().then(() => {
+            return true;
+          });
+        }
+      });
   }
   /**
    * resource
@@ -47,7 +47,11 @@ export default class Database {
   /**
    * getInfo
    */
-  public getInfo(): Promise<DatabaseInfo[]> {
+  public getInfo(withResources = false): Promise<DatabaseInfo[]> {
+    let params = {};
+    if (withResources) {
+      params = { withResources };
+    }
     return Axios.get(this.sirixInfo.sirixUri,
       {
         headers: {
@@ -72,7 +76,7 @@ export default class Database {
       })
       .then(res => {
         if (res.status === 201) {
-          return this.getInfo().then(() => {
+          return this.getInfo(true).then(() => {
             return true;
           });
         } else {
