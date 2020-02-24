@@ -32,7 +32,7 @@ export default class Database {
           console.error(res.status, res.data);
           return false;
         } else {
-          return this.getInfo().then(() => {
+          return this.getInfo(true).then(() => {
             return true;
           });
         }

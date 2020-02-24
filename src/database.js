@@ -28,7 +28,7 @@ class Database {
                 return false;
             }
             else {
-                return this.getInfo().then(() => {
+                return this.getInfo(true).then(() => {
                     return true;
                 });
             }
