@@ -29,7 +29,7 @@ class Database {
             }
             else {
                 this.sirixInfo.databaseInfo = this.sirixInfo.databaseInfo.filter(db => {
-                    return db.name === this.name;
+                    return db.name !== this.name;
                 });
                 return true;
             }
