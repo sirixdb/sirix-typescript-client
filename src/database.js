@@ -28,9 +28,10 @@ class Database {
                 return false;
             }
             else {
-                return this.getInfo(true).then(() => {
-                    return true;
+                this.sirixInfo.databaseInfo.filter(db => {
+                    return db.name === this.name;
                 });
+                return true;
             }
         });
     }
