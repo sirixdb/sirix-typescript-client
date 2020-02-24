@@ -52,8 +52,13 @@ class Database {
                 console.error(res.status, res.data);
                 return null;
             }
-            let db = this.sirixInfo.databaseInfo.find(obj => obj.name === this.name);
-            db = Object.assign(db, res.data["resources"]);
+            if (withResources) {
+                Object.assign(this.sirixInfo.databaseInfo, res.data["databases"]);
+            }
+            else {
+                let db = this.sirixInfo.databaseInfo.find(obj => obj.name === this.name);
+                db = Object.assign(db, res.data["resources"]);
+            }
             return this.sirixInfo.databaseInfo;
         });
     }
