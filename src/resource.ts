@@ -36,7 +36,9 @@ export default class Resource {
         return false;
       } else {
         let db = this.sirixInfo.databaseInfo.filter(obj => obj.name === this.dbName)[0];
-        db.resources.push(this.resourceName);
+        if (db.resources.indexOf(this.resourceName) === -1) {
+          db.resources.push(this.resourceName);
+        }
         return true;
       }
     });
