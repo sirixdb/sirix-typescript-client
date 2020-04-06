@@ -11,7 +11,8 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "axios": "^0.19.2"
+    "axios": "^0.19.2",
+    "xmldom": "^0.3.0"
   },
   "devDependencies": {
     "typescript": "^3.7.5"
