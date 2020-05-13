@@ -10,4 +10,5 @@ export default class Sirix {
     database(db_name: string, db_type?: string): Promise<Database>;
     getInfo(): Promise<DatabaseInfo[]>;
     delete(): Promise<boolean>;
+    query(query: string, startResultSeqIndex?: number, endResultSeqIndex?: number): Promise<any>;
 }

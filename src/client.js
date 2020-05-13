@@ -111,6 +111,25 @@ var Sirix = (function () {
             });
         });
     };
+    Sirix.prototype.query = function (query, startResultSeqIndex, endResultSeqIndex) {
+        if (startResultSeqIndex === void 0) { startResultSeqIndex = undefined; }
+        if (endResultSeqIndex === void 0) { endResultSeqIndex = undefined; }
+        var queryObj = { query: query, startResultSeqIndex: startResultSeqIndex, endResultSeqIndex: endResultSeqIndex };
+        if (startResultSeqIndex === undefined) {
+            delete queryObj.startResultSeqIndex;
+        }
+        if (endResultSeqIndex) {
+            delete queryObj.endResultSeqIndex;
+        }
+        return axios_1.default.post(this.sirixInfo.sirixUri, queryObj, { headers: { Authorization: "Bearer " + this.authData.access_token } })
+            .then(function (res) {
+            if (res.status != 200) {
+                console.error(res.status, res.data);
+                return false;
+            }
+            return res.data;
+        });
+    };
     return Sirix;
 }());
 exports.default = Sirix;

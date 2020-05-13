@@ -74,4 +74,29 @@ export default class Sirix {
     await this.getInfo();
     return true;
   }
+  /**
+   * query
+   */
+  public query(
+    query: string,
+    startResultSeqIndex: number = undefined,
+    endResultSeqIndex: number = undefined
+  ) {
+    let queryObj = { query, startResultSeqIndex, endResultSeqIndex };
+    if (startResultSeqIndex === undefined) {
+      delete queryObj.startResultSeqIndex;
+    }
+    if (endResultSeqIndex) {
+      delete queryObj.endResultSeqIndex;
+    }
+    return Axios.post(this.sirixInfo.sirixUri, queryObj,
+      { headers: { Authorization: `Bearer ${this.authData.access_token}` } })
+      .then(res => {
+        if (res.status != 200) {
+          console.error(res.status, res.data);
+          return false;
+        }
+        return res.data;
+      })
+  }
 }
