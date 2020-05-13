@@ -1,4 +1,15 @@
 "use strict";
+var __assign = (this && this.__assign) || function () {
+    __assign = Object.assign || function(t) {
+        for (var s, i = 1, n = arguments.length; i < n; i++) {
+            s = arguments[i];
+            for (var p in s) if (Object.prototype.hasOwnProperty.call(s, p))
+                t[p] = s[p];
+        }
+        return t;
+    };
+    return __assign.apply(this, arguments);
+};
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
     return new (P || (P = Promise))(function (resolve, reject) {
@@ -35,82 +46,71 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
         if (op[0] & 5) throw op[1]; return { value: op[0] ? op[1] : void 0, done: true };
     }
 };
-var __spreadArrays = (this && this.__spreadArrays) || function () {
-    for (var s = 0, i = 0, il = arguments.length; i < il; i++) s += arguments[i].length;
-    for (var r = Array(s), k = 0, i = 0; i < il; i++)
-        for (var a = arguments[i], j = 0, jl = a.length; j < jl; j++, k++)
-            r[k] = a[j];
-    return r;
-};
 Object.defineProperty(exports, "__esModule", { value: true });
 var axios_1 = require("axios");
-var auth_1 = require("./auth");
-var database_1 = require("./database");
-var Sirix = (function () {
-    function Sirix() {
-        this.authData = {
-            access_token: null,
-            expires_in: null,
-            refresh_expires_in: null,
-            refresh_token: null,
-            token_type: null,
-            not_before_policy: null,
-            session_state: null,
-            scope: null
-        };
+var Client = (function () {
+    function Client() {
     }
-    Sirix.prototype.authenticate = function (username, password, sirixUri, callback) {
-        this.sirixInfo = { sirixUri: sirixUri, databaseInfo: [] };
-        this.auth = new auth_1.default({ username: username, password: password, clientId: 'sirix' }, this.sirixInfo, this.authData, callback);
-    };
-    Sirix.prototype.database = function (db_name, db_type) {
-        if (db_type === void 0) { db_type = null; }
-        var db = new database_1.default(db_name, db_type, this.sirixInfo, this.authData);
-        return db.ready().then(function (res) {
-            if (res) {
-                return db;
-            }
-            return null;
-        });
-    };
-    Sirix.prototype.getInfo = function () {
-        var _this = this;
-        return axios_1.default.get(this.sirixInfo.sirixUri, {
-            params: { withResources: true },
-            headers: {
-                Accept: 'application/json',
-                Authorization: "Bearer " + this.authData.access_token
-            }
-        }).then(function (res) {
-            var _a;
-            if (res.status >= 400) {
-                console.error(res.status, res.data);
-                return null;
-            }
-            (_a = _this.sirixInfo.databaseInfo).splice.apply(_a, __spreadArrays([0, _this.sirixInfo.databaseInfo.length], res.data["databases"]));
-            return _this.sirixInfo.databaseInfo;
-        });
-    };
-    Sirix.prototype.delete = function () {
+    Client.prototype.init = function (loginInfo, sirixUri) {
         return __awaiter(this, void 0, void 0, function () {
-            var res;
+            var _this = this;
             return __generator(this, function (_a) {
-                switch (_a.label) {
-                    case 0: return [4, axios_1.default.delete(this.sirixInfo.sirixUri, { headers: { Authorization: "Bearer " + this.authData.access_token } })];
-                    case 1:
-                        res = _a.sent();
-                        if (res.status >= 400) {
-                            console.error(res.status, res.data);
-                            return [2, false];
-                        }
-                        return [4, this.getInfo()];
-                    case 2:
-                        _a.sent();
-                        return [2, true];
-                }
+                initClient(loginInfo, sirixUri)
+                    .then(function (client) {
+                    _this._client = client;
+                });
+                return [2];
             });
         });
     };
-    return Sirix;
+    return Client;
 }());
-exports.default = Sirix;
+exports.default = Client;
+function initClient(loginInfo, sirixUri) {
+    function refreshTokenWithCredentials() {
+        return axios_1.default.post(sirixUri + "/token", loginInfo)
+            .then(function (res) {
+            if (res.status === 200) {
+                return res.data;
+            }
+            else {
+                console.error(res.status, res.data);
+                console.error("failed to retrieve an access token. aborting");
+                return undefined;
+            }
+        });
+    }
+    return axios_1.default.post(sirixUri + "/token", loginInfo)
+        .then(function (res) {
+        var authData = res.data;
+        setTimeout(function () {
+            refreshClient(authData, sirixUri)
+                .then(function (newAuthData) {
+                if (newAuthData !== undefined) {
+                    authData = newAuthData;
+                }
+                else {
+                    console.debug("token refresh failed. retrying");
+                    refreshTokenWithCredentials()
+                        .then(function (newAuthData) {
+                        authData = newAuthData;
+                    });
+                }
+            });
+        }, (authData.expires_in - 10) * 1000);
+        return function request(config) {
+            config.headers = __assign(__assign({}, config.headers), { authorization: authData.access_token });
+            return axios_1.default(config);
+        };
+    });
+}
+function refreshClient(authData, sirixUri) {
+    return axios_1.default.post(sirixUri + "/token", { refresh_token: authData.refresh_token, grant_type: 'refresh_token' })
+        .then(function (res) {
+        if (res.status !== 200) {
+            console.error(res.status, res.data);
+            return undefined;
+        }
+        return res.data;
+    });
+}
