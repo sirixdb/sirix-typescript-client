@@ -19,4 +19,3 @@ export default class Client {
     getEtag(dbName: string, contentType: ContentType, resource: string, params: ReadParams): AxiosPromise<any>;
     update(dbName: string, contentType: ContentType, resource: string, updateParams: UpdateParams): AxiosPromise<any>;
     resourceDelete(dbName: string, contentType: ContentType, resource: string, nodeId: number | null, ETag: string | null): AxiosPromise;
-}
