@@ -1,77 +1,84 @@
 import Axios from 'axios';
 
-import Auth from './auth';
+import Client from "./client";
 import Database from './database'
 
-import { SirixInfo, AuthData, DatabaseInfo } from './info'
+import {DatabaseInfo, DBType, LoginInfo, StringMap} from './info'
+
+function sirixInit(loginInfo: LoginInfo, sirixUri: string): Promise<Sirix> {
+    const sirix = new Sirix();
+    return sirix.init(loginInfo, sirixUri)
+        .then(() => {
+            return sirix;
+        });
+}
 
 export default class Sirix {
-  constructor() {
-    // initialize with null, so as to fit with the interface
-    this.authData = {
-      access_token: null,
-      expires_in: null,
-      refresh_expires_in: null,
-      refresh_token: null,
-      token_type: null,
-      not_before_policy: null,
-      session_state: null,
-      scope: null
+    /**
+     * This class is the entrypoint to interacting with a SirixDB server.
+     * It interacts with the root level of the server, and provides
+     * an API to access the Database class
+     *
+     * @remarks
+     * If instantiating this class directly, the `init` method must be called.
+     * the `sirixInit` function does this for you.
+     */
+    constructor() {
+        this._client = new Client();
     }
-  }
-  public auth: Auth;
-  public sirixInfo: SirixInfo;
-  private authData: AuthData;
-  /**
-   * authenticate
-   */
-  public authenticate(username: string, password: string, sirixUri: string, callback: Function) {
-    this.sirixInfo = { sirixUri, databaseInfo: [] };
-    this.auth = new Auth({ username, password, clientId: 'sirix' }, this.sirixInfo, this.authData, callback);
-  }
-  /**
-   * database
-   */
-  public database(db_name: string, db_type: string = null): Promise<Database> {
-    const db = new Database(db_name, db_type, this.sirixInfo, this.authData);
-    return db.ready().then(res => {
-      if (res) {
-        return db;
-      }
-      return null;
-    });
-  }
-  /**
-   * getInfo
-   */
-  public getInfo(): Promise<DatabaseInfo[]> {
-    return Axios.get(this.sirixInfo.sirixUri,
-      {
-        params: { withResources: true },
-        headers: {
-          Accept: 'application/json',
-          Authorization: `Bearer ${this.authData.access_token}`
-        }
-      }).then(res => {
-        if (res.status >= 400) {
-          console.error(res.status, res.data);
-          return null;
-        }
-        this.sirixInfo.databaseInfo.splice(0, this.sirixInfo.databaseInfo.length, ...res.data["databases"]);
-        return this.sirixInfo.databaseInfo;
-      });
-  }
-  /**
-   * delete
-   */
-  public async delete(): Promise<boolean> {
-    let res = await Axios.delete(this.sirixInfo.sirixUri,
-      { headers: { Authorization: `Bearer ${this.authData.access_token}` } });
-    if (res.status >= 400) {
-      console.error(res.status, res.data);
-      return false;
+
+    /**
+     * init
+     *
+     */
+    public init(loginInfo: LoginInfo, sirixUri: string): Promise<void> {
+        return this._client.init(loginInfo, sirixUri);
     }
-    await this.getInfo();
-    return true;
-  }
+
+    private readonly _client: Client;
+
+    /**
+     * database
+     */
+    public database(dbName: string, dbType: DBType): Database {
+        return new Database(dbName, dbType, this._client);
+    }
+
+    /**
+     * getInfo
+     */
+    public getInfo(resources: boolean): Promise<DatabaseInfo[]> {
+        return this._client.globalInfo(resources)
+            .then(res => {
+                return res.data.databases as DatabaseInfo[];
+            });
+    }
+
+    /**
+     * query
+     */
+    public query(query: string, startResultSeqIndex: number | undefined,
+                 endResultSeqIndex: number | undefined) {
+        const queryObj: StringMap = {query, startResultSeqIndex, endResultSeqIndex};
+        Object.keys(queryObj).forEach(param => {
+            if (param === undefined) {
+                delete queryObj[param];
+            }
+        });
+        return this._client.postQuery(
+            queryObj as unknown as Map<string, string | number>);
+    }
+
+    /**
+     * delete
+     */
+    public deleteAll(): Promise<boolean> {
+        return this._client.deleteAll()
+            .then(() => {
+                return true;
+            })
+            .catch(() => {
+                return false;
+            });
+    }
 }

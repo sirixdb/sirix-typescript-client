@@ -1,5 +1,18 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
+exports.NodeType = exports.ContentType = exports.DBType = void 0;
+var DBType;
+(function (DBType) {
+    DBType["JSON"] = "JSON";
+    DBType["XML"] = "XML";
+})(DBType || (DBType = {}));
+exports.DBType = DBType;
+var ContentType;
+(function (ContentType) {
+    ContentType["JSON"] = "application/json";
+    ContentType["XML"] = "application/xml";
+})(ContentType || (ContentType = {}));
+exports.ContentType = ContentType;
 var NodeType;
 (function (NodeType) {
     NodeType["OBJECT"] = "OBJECT";

@@ -1,4 +1,15 @@
 "use strict";
+var __assign = (this && this.__assign) || function () {
+    __assign = Object.assign || function(t) {
+        for (var s, i = 1, n = arguments.length; i < n; i++) {
+            s = arguments[i];
+            for (var p in s) if (Object.prototype.hasOwnProperty.call(s, p))
+                t[p] = s[p];
+        }
+        return t;
+    };
+    return __assign.apply(this, arguments);
+};
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
     return new (P || (P = Promise))(function (resolve, reject) {
@@ -36,62 +47,90 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
     }
 };
 Object.defineProperty(exports, "__esModule", { value: true });
+exports.initClient = void 0;
 var axios_1 = require("axios");
-var Auth = (function () {
-    function Auth(loginInfo, sirixInfo, authData, callback) {
-        this.loginInfo = loginInfo;
-        this.sirixInfo = sirixInfo;
-        this.authData = authData;
-        this.callback = callback;
-    }
-    Auth.prototype.authenticate = function () {
-        var _this = this;
-        return axios_1.default.post(this.sirixInfo.sirixUri + "/token", { username: this.loginInfo.username, password: this.loginInfo.password, grant_type: 'password' })
+function initClient(loginInfo, sirixUri) {
+    var authData;
+    var timeout;
+    function getTokenWithCredentials() {
+        return axios_1.default.post(sirixUri + "/token", __assign(__assign({}, loginInfo), { grant_type: "password" }))
             .then(function (res) {
-            if (res.status >= 400) {
+            if (res.status !== 200) {
                 console.error(res.status, res.data);
-                return false;
+                console.debug("failed to retrieve an access token using credentials. aborting");
+                throw Error("failed to retrieve an access token using credentials");
             }
-            else {
-                Object.assign(_this.authData, res.data);
-                _this.setRefreshTimeout();
-                return true;
-            }
+            authData = res.data;
+            shutdown();
+            timeout = setTimeout(refreshAndSetTimeout, (authData.expires_in - 10) * 1000);
         });
-    };
-    Auth.prototype.setRefreshTimeout = function () {
-        var _this = this;
-        this.timeout = setTimeout(function () { return _this.refresh(); }, (this.authData.expires_in - 5) * 1000);
-    };
-    Auth.prototype.destroy = function () {
-        if (this.timeout) {
-            clearTimeout(this.timeout);
-        }
-    };
-    Auth.prototype.refresh = function () {
+    }
+    function refreshAndSetTimeout() {
         return __awaiter(this, void 0, void 0, function () {
-            var res;
+            var attempt, newAuthData;
             return __generator(this, function (_a) {
                 switch (_a.label) {
-                    case 0: return [4, axios_1.default.post(this.sirixInfo.sirixUri + "/token", { refresh_token: this.authData.refresh_token, grant_type: 'refresh_token' })];
-                    case 1:
-                        res = _a.sent();
-                        if (!(res.status >= 400)) return [3, 3];
-                        console.error(res.status, res.data);
-                        return [4, this.callback()];
+                    case 0:
+                        attempt = 0;
+                        _a.label = 1;
+                    case 1: return [4, refreshClient(authData, sirixUri)];
                     case 2:
-                        _a.sent();
-                        this.setRefreshTimeout();
-                        return [3, 4];
+                        newAuthData = _a.sent();
+                        attempt++;
+                        if (newAuthData === undefined) {
+                            console.debug("token refresh (attempt " + attempt + ") failed. retrying");
+                        }
+                        _a.label = 3;
                     case 3:
-                        Object.assign(this.authData, res.data);
-                        this.setRefreshTimeout();
+                        if (newAuthData === undefined && attempt < 3) return [3, 1];
                         _a.label = 4;
-                    case 4: return [2];
+                    case 4:
+                        if (!(newAuthData !== undefined)) return [3, 5];
+                        authData = newAuthData;
+                        shutdown();
+                        timeout = setTimeout(refreshAndSetTimeout, (authData.expires_in - 10) * 1000);
+                        return [3, 7];
+                    case 5:
+                        console.debug("token refresh (attempt " + attempt + ") failed. attempting to retrieve access token using credentials");
+                        return [4, getTokenWithCredentials()];
+                    case 6:
+                        _a.sent();
+                        _a.label = 7;
+                    case 7: return [2];
                 }
             });
         });
-    };
-    return Auth;
-}());
-exports.default = Auth;
+    }
+    function refreshClient(authData, sirixUri) {
+        return axios_1.default.post(sirixUri + "/token", { refresh_token: authData.refresh_token, grant_type: 'refresh_token' })
+            .then(function (res) {
+            if (res.status === 200) {
+                return res.data;
+            }
+            return undefined;
+        })
+            .catch(function (res) {
+            console.error(res.status, res.data);
+            return undefined;
+        });
+    }
+    function shutdown() {
+        clearTimeout(timeout);
+    }
+    function request(config) {
+        if (typeof config.headers === "object") {
+            config.headers = __assign(__assign({}, config.headers), { authorization: authData.token_type + " " + authData.access_token });
+        }
+        else {
+            config.headers = {
+                authorization: authData.token_type + " " + authData.access_token
+            };
+        }
+        return axios_1.default.request(__assign(__assign({}, config), { baseURL: sirixUri }));
+    }
+    return getTokenWithCredentials()
+        .then(function () {
+        return { request: request, shutdown: shutdown };
+    });
+}
+exports.initClient = initClient;

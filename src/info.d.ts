@@ -1,3 +1,12 @@
+import { Insert } from "./constants";
+declare enum DBType {
+    JSON = "JSON",
+    XML = "XML"
+}
+declare enum ContentType {
+    JSON = "application/json",
+    XML = "application/xml"
+}
 interface SirixInfo {
     sirixUri: string;
     databaseInfo?: DatabaseInfo[];
@@ -10,7 +19,6 @@ interface DatabaseInfo {
 interface LoginInfo {
     username: string;
     password: string;
-    grant_type: string;
 }
 interface AuthData {
     access_token: string;
@@ -23,17 +31,32 @@ interface AuthData {
     session_state: string;
     scope: string;
 }
+export interface StringMap {
+    [key: string]: string | number;
+}
 declare type Revision = number | Date;
 interface ReadParams {
     nodeId?: number;
     maxLevel?: number;
-    withMetadata?: boolean;
+    withMetadata?: boolean | string;
     revision?: number;
     "revision-timestamp"?: string;
     "start-revision"?: number;
     "end-revision"?: number;
     "start-revision-timestamp"?: string;
     "end-revision-timestamp"?: string;
+}
+interface DiffParams {
+    "first-revision"?: string | number;
+    "second-revision"?: string | number;
+    startNodeKey?: number;
+    maxDepth?: number;
+}
+interface UpdateParams {
+    nodeId: number;
+    data: any;
+    insert?: Insert;
+    etag?: string;
 }
 interface Commit {
     revisionTimestamp: string;
@@ -95,4 +118,4 @@ interface MetaNode {
     key?: string;
     value: MetaNode[] | {} | [] | MetaNode | string | number | boolean | null;
 }
-export { SirixInfo, DatabaseInfo, LoginInfo, AuthData, Revision, ReadParams, Commit, DiffResponse, Diff, MetaNode, NodeType };
+export { DBType, ContentType, SirixInfo, DatabaseInfo, LoginInfo, AuthData, Revision, ReadParams, DiffParams, UpdateParams, Commit, DiffResponse, Diff, MetaNode, NodeType };

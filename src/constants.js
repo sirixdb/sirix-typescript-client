@@ -1,12 +1,12 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-function contentType(type) {
-    if (type === 'json') {
-        return 'application/json';
+exports.Insert = exports.contentType = void 0;
+var info_1 = require("./info");
+function contentType(dbType) {
+    if (dbType === info_1.DBType.JSON) {
+        return info_1.ContentType.JSON;
     }
-    else {
-        return 'application/xml';
-    }
+    return info_1.ContentType.XML;
 }
 exports.contentType = contentType;
 var Insert;

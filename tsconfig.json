@@ -10,7 +10,12 @@
         "target": "es5"
     },
     "files": [
+        "./src/auth.ts",
         "./src/client.ts",
-        "./src/info.ts"
+        "./src/constants.ts",
+        "./src/database.ts",
+        "./src/info.ts",
+        "./src/resource.ts",
+        "./src/sirix.ts"
     ]
 }
