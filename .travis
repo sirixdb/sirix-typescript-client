@@ -1,0 +1,8 @@
+dist: bionic
+services:
+  - docker
+language: node_js
+node_js:
+  - lts/*
+before_install:
+  - bash ./test.sh
