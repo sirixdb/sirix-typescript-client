@@ -1,3 +1,12 @@
+import { Insert } from "./constants";
+declare enum DBType {
+    JSON = "JSON",
+    XML = "XML"
+}
+declare enum ContentType {
+    JSON = "application/json",
+    XML = "application/xml"
+}
 interface SirixInfo {
     sirixUri: string;
     databaseInfo?: DatabaseInfo[];
@@ -10,11 +19,11 @@ interface DatabaseInfo {
 interface LoginInfo {
     username: string;
     password: string;
-    clientId: string;
 }
 interface AuthData {
     access_token: string;
     expires_in: number;
+    expires_at: number;
     refresh_expires_in: number;
     refresh_token: string;
     token_type: string;
@@ -26,13 +35,35 @@ declare type Revision = number | Date;
 interface ReadParams {
     nodeId?: number;
     maxLevel?: number;
-    withMetadata?: boolean;
+    withMetadata?: MetaType;
     revision?: number;
     "revision-timestamp"?: string;
     "start-revision"?: number;
     "end-revision"?: number;
     "start-revision-timestamp"?: string;
     "end-revision-timestamp"?: string;
+}
+declare enum MetaType {
+    ALL = "true",
+    KEY = "nodeKey",
+    KEYAndChild = "nodeKeyAndChildCount"
+}
+interface DiffParams {
+    "first-revision"?: string | number;
+    "second-revision"?: string | number;
+    startNodeKey?: number;
+    maxDepth?: number;
+}
+interface UpdateParams {
+    nodeId: number;
+    data: any;
+    insert?: Insert;
+    etag?: string;
+}
+interface QueryParams {
+    query: string;
+    startResultSeqIndex?: number;
+    endResultSeqIndex?: number;
 }
 interface Commit {
     revisionTimestamp: string;
@@ -94,4 +125,4 @@ interface MetaNode {
     key?: string;
     value: MetaNode[] | {} | [] | MetaNode | string | number | boolean | null;
 }
-export { SirixInfo, DatabaseInfo, LoginInfo, AuthData, Revision, ReadParams, Commit, DiffResponse, Diff, MetaNode, NodeType };
+export { DBType, ContentType, SirixInfo, DatabaseInfo, LoginInfo, AuthData, Revision, ReadParams, MetaType, DiffParams, UpdateParams, QueryParams, Commit, DiffResponse, Diff, MetaNode, NodeType };

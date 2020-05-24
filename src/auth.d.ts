@@ -1,13 +1,10 @@
-import { SirixInfo, LoginInfo, AuthData } from './info';
-export default class Auth {
-    private loginInfo;
-    private sirixInfo;
-    private authData;
-    callback: Function;
-    constructor(loginInfo: LoginInfo, sirixInfo: SirixInfo, authData: AuthData, callback: Function);
-    private timeout;
-    authenticate(): Promise<boolean>;
-    private setRefreshTimeout;
-    destroy(): void;
-    private refresh;
+import { LoginInfo } from "./info";
+import { AxiosPromise, AxiosRequestConfig } from "axios";
+export declare type request = (config: AxiosRequestConfig) => AxiosPromise;
+export declare type shutdown = () => void;
+interface Auth {
+    request: request;
+    shutdown: shutdown;
 }
+export declare function initClient(loginInfo: LoginInfo, sirixUri: string): Promise<Auth>;
+export {};

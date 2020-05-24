@@ -1,31 +1,34 @@
-import { Insert } from './utils';
-import { SirixInfo, AuthData, Revision, Commit, MetaNode, DiffResponse } from './info';
+import { AxiosResponse } from "axios";
+import { Commit, ContentType, DBType, DiffResponse, MetaNode, MetaType, QueryParams, Revision, UpdateParams } from './info';
+import Client from "./client";
 export default class Resource {
-    private dbName;
-    private resourceName;
-    private type;
-    private sirixInfo;
-    private authData;
-    constructor(dbName: string, resourceName: string, type: string, sirixInfo: SirixInfo, authData: AuthData);
-    create(data: string): Promise<boolean>;
-    history(): Promise<Commit[]>;
-    diff(firstRevision: Revision, secondRevision: Revision, inputParams: {
-        nodeId?: number;
-        maxLevel?: number;
-    }): Promise<DiffResponse>;
+    readonly dbName: string;
+    readonly name: string;
+    readonly dbType: DBType;
+    private readonly contentType;
+    private readonly _client;
+    constructor(dbName: string, name: string, dbType: DBType, contentType: ContentType, _client: Client);
+    create(data: string): Promise<AxiosResponse>;
+    exists(): Promise<boolean>;
     read(inputParams: {
         nodeId?: number;
         revision?: Revision | [Revision, Revision];
         maxLevel?: number;
-    }): Promise<string | JSON>;
+    } | undefined): Promise<string | JSON>;
     readWithMetadata(inputParams: {
         nodeId?: number;
         revision?: Revision | [Revision, Revision];
         maxLevel?: number;
+        metaType?: MetaType;
     }): Promise<MetaNode>;
-    private readParams;
-    updateById(nodeId: number, data: string, insert: Insert): Promise<boolean>;
-    update(nodeId: number, ETag: string, data: string, insert: Insert): Promise<boolean>;
-    deleteById(nodeId: number | null): Promise<boolean>;
-    delete(nodeId: number | null, ETag: number): Promise<boolean>;
+    private static _readParams;
+    history(): Promise<Commit[]>;
+    diff(firstRevision: Revision, secondRevision: Revision, inputParams?: {
+        nodeId?: number;
+        maxLevel?: number;
+    }): Promise<DiffResponse>;
+    getEtag(nodeId: number): Promise<string>;
+    update(updateParams: UpdateParams): Promise<AxiosResponse>;
+    query(queryParams: QueryParams): Promise<string>;
+    delete(nodeId: number | null, ETag: string | null): Promise<AxiosResponse>;
 }

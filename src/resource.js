@@ -47,115 +47,38 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
     }
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-var axios_1 = require("axios");
-var utils_1 = require("./utils");
+var constants_1 = require("./constants");
+var info_1 = require("./info");
 var Resource = (function () {
-    function Resource(dbName, resourceName, type, sirixInfo, authData) {
+    function Resource(dbName, name, dbType, contentType, _client) {
         this.dbName = dbName;
-        this.resourceName = resourceName;
-        this.type = type;
-        this.sirixInfo = sirixInfo;
-        this.authData = authData;
-        var db = sirixInfo.databaseInfo.filter(function (obj) { return obj.name === name; });
-        if (db.length > 0) {
-            this.type = db[0].type;
-        }
+        this.name = name;
+        this.dbType = dbType;
+        this.contentType = contentType;
+        this._client = _client;
     }
     Resource.prototype.create = function (data) {
-        var _this = this;
-        return axios_1.default.put(this.sirixInfo.sirixUri + "/" + this.dbName + "/" + this.resourceName, data, {
-            headers: {
-                Authorization: "Bearer " + this.authData.access_token,
-                'Content-Type': utils_1.contentType(this.type),
-                'Accept': utils_1.contentType(this.type)
-            }
-        }).then(function (res) {
-            if (res.status !== 200) {
-                console.error(res.status, res.data);
-                return false;
-            }
-            else {
-                var db = _this.sirixInfo.databaseInfo.filter(function (obj) { return obj.name === _this.dbName; })[0];
-                if (db.resources.indexOf(_this.resourceName) === -1) {
-                    db.resources.push(_this.resourceName);
-                }
-                return true;
-            }
-        });
+        return this._client.createResource(this.dbName, this.contentType, this.name, data);
     };
-    Resource.prototype.history = function () {
-        return axios_1.default.get(this.sirixInfo.sirixUri + "/" + this.dbName + "/" + this.resourceName + "/history", {
-            headers: { Authorization: "Bearer " + this.authData.access_token }
-        }).then(function (res) {
-            if (res.status !== 200) {
-                console.error(res.status, res.data);
-                return null;
-            }
-            else {
-                return res.data["history"];
-            }
-        });
-    };
-    Resource.prototype.diff = function (firstRevision, secondRevision, inputParams) {
-        var params = {};
-        if (inputParams.nodeId) {
-            params = __assign(__assign({}, params), { startNodeKey: inputParams.nodeId });
-        }
-        if (inputParams.maxLevel) {
-            params = __assign(__assign({}, params), { maxDepth: inputParams.maxLevel });
-        }
-        if (typeof firstRevision === "number" && typeof secondRevision === "number") {
-            params = __assign(__assign({}, params), { "first-revision": firstRevision, "second-revision": secondRevision });
-        }
-        else if (firstRevision instanceof Date && secondRevision instanceof Date) {
-            params = __assign(__assign({}, params), { "first-revision": firstRevision.toISOString(), "second-revision": secondRevision.toISOString() });
-        }
-        return axios_1.default.get(this.sirixInfo.sirixUri + "/" + this.dbName + "/" + this.resourceName + "/diff", {
-            params: params,
-            headers: { Authorization: "Bearer " + this.authData.access_token }
-        }).then(function (res) {
-            if (res.status !== 200) {
-                console.error(res.status, res.data);
-                return null;
-            }
-            else {
-                return res.data;
-            }
-        });
+    Resource.prototype.exists = function () {
+        return this._client.resourceExists(this.dbName, this.contentType, this.name);
     };
     Resource.prototype.read = function (inputParams) {
-        var params = this.readParams(inputParams);
-        return axios_1.default.get(this.sirixInfo.sirixUri + "/" + this.dbName + "/" + this.resourceName, {
-            params: params,
-            headers: { Authorization: "Bearer " + this.authData.access_token, 'Content-Type': utils_1.contentType(this.type) }
-        }).then(function (res) {
-            if (res.status !== 200) {
-                console.error(res.status, res.data);
-                return null;
-            }
-            else {
-                return res.data;
-            }
+        var params = Resource._readParams(inputParams);
+        return this._client.readResource(this.dbName, this.contentType, this.name, params)
+            .then(function (res) {
+            return res.data;
         });
     };
     Resource.prototype.readWithMetadata = function (inputParams) {
-        var params = this.readParams(inputParams);
-        params["withMetadata"] = true;
-        return axios_1.default.get(this.sirixInfo.sirixUri + "/" + this.dbName + "/" + this.resourceName, {
-            params: params,
-            headers: { Authorization: "Bearer " + this.authData.access_token, 'Content-Type': utils_1.contentType(this.type) }
-        }).then(function (res) {
-            if (res.status !== 200) {
-                console.error(res.status, res.data);
-                return null;
-            }
-            else {
-                return res.data;
-            }
+        var params = Resource._readParams(__assign(__assign({}, inputParams), { metaType: inputParams.metaType ? inputParams.metaType : info_1.MetaType.ALL }));
+        return this._client.readResource(this.dbName, this.contentType, this.name, params)
+            .then(function (res) {
+            return res.data;
         });
     };
-    Resource.prototype.readParams = function (inputParams) {
-        var _a = __assign({}, inputParams), nodeId = _a.nodeId, revision = _a.revision, maxLevel = _a.maxLevel;
+    Resource._readParams = function (inputParams) {
+        var _a = __assign({}, inputParams), nodeId = _a.nodeId, revision = _a.revision, maxLevel = _a.maxLevel, metaType = _a.metaType;
         var params = {};
         if (nodeId) {
             params['nodeId'] = nodeId;
@@ -179,109 +102,80 @@ var Resource = (function () {
                 params['end-revision-timestamp'] = revision[1].toISOString();
             }
         }
+        if (metaType) {
+            params.withMetadata = metaType;
+        }
         return params;
     };
-    Resource.prototype.updateById = function (nodeId, data, insert) {
+    Resource.prototype.history = function () {
+        return this._client.history(this.dbName, this.contentType, this.name);
+    };
+    Resource.prototype.diff = function (firstRevision, secondRevision, inputParams) {
+        var params = {};
+        if (inputParams) {
+            if (inputParams.nodeId) {
+                params.startNodeKey = inputParams.nodeId;
+            }
+            if (inputParams.maxLevel) {
+                params.maxDepth = inputParams.maxLevel;
+            }
+        }
+        if (typeof firstRevision === "number" && typeof secondRevision === "number") {
+            params["first-revision"] = firstRevision;
+            params["second-revision"] = secondRevision;
+        }
+        else if (firstRevision instanceof Date && secondRevision instanceof Date) {
+            params["first-revision"] = firstRevision.toISOString();
+            params["second-revision"] = secondRevision.toISOString();
+        }
+        return this._client.diff(this.dbName, this.name, params)
+            .then(function (res) {
+            return res.data.diffs;
+        });
+    };
+    Resource.prototype.getEtag = function (nodeId) {
+        return this._client.getEtag(this.dbName, this.contentType, this.name, { nodeId: nodeId })
+            .then(function (res) {
+            return res.headers.etag;
+        });
+    };
+    Resource.prototype.update = function (updateParams) {
         return __awaiter(this, void 0, void 0, function () {
-            var params, head, ETag;
-            return __generator(this, function (_a) {
-                switch (_a.label) {
+            var _a;
+            return __generator(this, function (_b) {
+                switch (_b.label) {
                     case 0:
-                        params = { nodeId: nodeId };
-                        return [4, axios_1.default.head(this.sirixInfo.sirixUri + "/" + this.dbName + "/" + this.resourceName, {
-                                params: params, headers: {
-                                    Authorization: "Bearer " + this.authData.access_token, 'Content-Type': utils_1.contentType(this.type)
-                                }
-                            })];
-                    case 1:
-                        head = _a.sent();
-                        if (head.status !== 200) {
-                            console.error(head.status, head.data);
-                            return [2, null];
+                        if (updateParams.insert === undefined) {
+                            updateParams.insert = constants_1.Insert.CHILD;
                         }
-                        ETag = head.headers['ETag'];
-                        return [4, this.update(nodeId, ETag, data, insert)];
-                    case 2: return [2, _a.sent()];
+                        if (!(updateParams.etag == undefined)) return [3, 2];
+                        _a = updateParams;
+                        return [4, this.getEtag(updateParams.nodeId)];
+                    case 1:
+                        _a.etag = _b.sent();
+                        _b.label = 2;
+                    case 2: return [2, this._client.update(this.dbName, this.contentType, this.name, updateParams)];
                 }
             });
         });
     };
-    Resource.prototype.update = function (nodeId, ETag, data, insert) {
-        return __awaiter(this, void 0, void 0, function () {
-            var res;
-            return __generator(this, function (_a) {
-                switch (_a.label) {
-                    case 0: return [4, axios_1.default.post(this.sirixInfo.sirixUri + "/" + this.dbName + "/" + this.resourceName, data, {
-                            params: { nodeId: nodeId, insert: insert },
-                            headers: {
-                                Authorization: "Bearer " + this.authData.access_token, 'Content-Type': utils_1.contentType(this.type)
-                            }
-                        })];
-                    case 1:
-                        res = _a.sent();
-                        if (res.status !== 201) {
-                            console.error(res.status, res.data);
-                            return [2, false];
-                        }
-                        return [2, true];
-                }
-            });
-        });
-    };
-    Resource.prototype.deleteById = function (nodeId) {
-        return __awaiter(this, void 0, void 0, function () {
-            var params, headers, head;
-            return __generator(this, function (_a) {
-                switch (_a.label) {
-                    case 0:
-                        params = {};
-                        if (nodeId !== null) {
-                            params = { nodeId: nodeId };
-                        }
-                        headers = { Authorization: "Bearer " + this.authData.access_token, Accept: utils_1.contentType(this.type) };
-                        return [4, axios_1.default.head(this.sirixInfo.sirixUri + "/" + this.dbName + "/" + this.resourceName, { params: params, headers: headers })];
-                    case 1:
-                        head = _a.sent();
-                        if (head.status !== 200) {
-                            console.error(head.status, head.data);
-                            return [2, false];
-                        }
-                        return [2, this.delete(nodeId, head.headers['ETag'])];
-                }
-            });
+    Resource.prototype.query = function (queryParams) {
+        return this._client.readResource(this.dbName, this.contentType, this.name, queryParams)
+            .then(function (res) {
+            return res.data;
         });
     };
     Resource.prototype.delete = function (nodeId, ETag) {
         return __awaiter(this, void 0, void 0, function () {
-            var params, headers, res, db;
-            var _this = this;
             return __generator(this, function (_a) {
                 switch (_a.label) {
                     case 0:
-                        params = {};
-                        headers = {};
-                        if (nodeId != null) {
-                            params = { nodeId: nodeId };
-                            headers = { Authorization: "Bearer " + this.authData.access_token, ETag: ETag };
-                        }
-                        else {
-                            headers = { Authorization: "Bearer " + this.authData.access_token };
-                        }
-                        return [4, axios_1.default.delete(this.sirixInfo.sirixUri + "/" + this.dbName + "/" + this.resourceName, { params: params, headers: headers })];
+                        if (!(!ETag && nodeId)) return [3, 2];
+                        return [4, this.getEtag(nodeId)];
                     case 1:
-                        res = _a.sent();
-                        if (res.status !== 204) {
-                            console.error(res.status, res.data);
-                            return [2, false];
-                        }
-                        else {
-                            if (nodeId === null) {
-                                db = this.sirixInfo.databaseInfo.filter(function (obj) { return obj.name === _this.dbName; })[0];
-                                db.resources.splice(db.resources.findIndex(function (val) { return val === _this.resourceName; }));
-                            }
-                            return [2, true];
-                        }
-                        return [2];
+                        ETag = _a.sent();
+                        _a.label = 2;
+                    case 2: return [2, this._client.resourceDelete(this.dbName, this.contentType, this.name, nodeId, ETag)];
                 }
             });
         });

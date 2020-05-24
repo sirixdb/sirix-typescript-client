@@ -1,102 +1,141 @@
-import Axios from 'axios';
+import {initClient, request, shutdown} from "./auth";
+import {ContentType, DiffParams, LoginInfo, QueryParams, ReadParams, UpdateParams} from "./info";
+import {AxiosPromise} from "axios";
 
-import Auth from './auth';
-import Database from './database'
+export default class Client {
+    private _request: request;
+    public shutdown: shutdown;
 
-import { SirixInfo, AuthData, DatabaseInfo } from './info'
+    public init(loginInfo: LoginInfo, sirixUri: string) {
+        return initClient(loginInfo, sirixUri)
+            .then(({request, shutdown}) => {
+                this._request = request;
+                this.shutdown = shutdown;
+            });
+    }
 
-export default class Sirix {
-  constructor() {
-    // initialize with null, so as to fit with the interface
-    this.authData = {
-      access_token: null,
-      expires_in: null,
-      refresh_expires_in: null,
-      refresh_token: null,
-      token_type: null,
-      not_before_policy: null,
-      session_state: null,
-      scope: null
-    }
-  }
-  public auth: Auth;
-  public sirixInfo: SirixInfo;
-  private authData: AuthData;
-  /**
-   * authenticate
-   */
-  public authenticate(username: string, password: string, sirixUri: string, callback: Function) {
-    this.sirixInfo = { sirixUri, databaseInfo: [] };
-    this.auth = new Auth({ username, password, clientId: 'sirix' }, this.sirixInfo, this.authData, callback);
-  }
-  /**
-   * database
-   */
-  public database(db_name: string, db_type: string = null): Promise<Database> {
-    const db = new Database(db_name, db_type, this.sirixInfo, this.authData);
-    return db.ready().then(res => {
-      if (res) {
-        return db;
-      }
-      return null;
-    });
-  }
-  /**
-   * getInfo
-   */
-  public getInfo(): Promise<DatabaseInfo[]> {
-    return Axios.get(this.sirixInfo.sirixUri,
-      {
-        params: { withResources: true },
-        headers: {
-          Accept: 'application/json',
-          Authorization: `Bearer ${this.authData.access_token}`
+    public globalInfo(resources: boolean = true): AxiosPromise {
+        let params = {};
+        if (resources) {
+            params = {"withResources": true};
         }
-      }).then(res => {
-        if (res.status >= 400) {
-          console.error(res.status, res.data);
-          return null;
+        return this._request({method: "GET", url: "/", params});
+    }
+
+    public deleteAll(): AxiosPromise {
+        return this._request({method: "DELETE", url: "/"});
+    }
+
+    public createDatabase(name: string, contentType: ContentType): AxiosPromise {
+        return this._request({
+            url: `/${name}`,
+            method: "PUT",
+            headers: {"content-type": contentType}
+        })
+    }
+
+    public getDatabaseInfo(name: string): AxiosPromise {
+        return this._request({
+            method: "GET",
+            url: `/${name}`, headers: {"accept": ContentType.JSON}
+        });
+    }
+
+    public deleteDatabase(name: string): AxiosPromise {
+        return this._request({method: "DELETE", url: `/${name}`});
+    }
+
+    public resourceExists(dbName: string, contentType: ContentType,
+                          resource: string): Promise<boolean> {
+        return this._request({
+            method: "HEAD",
+            url: `/${dbName}/${resource}`, headers: {"accept": ContentType}
+        })
+            .then(() => {
+                return true;
+            })
+            .catch(err => {
+                if (err.response.status === 404) {
+                    return false;
+                } else {
+                    console.log(err)
+                    throw Error(err);
+                }
+            });
+    }
+
+    public createResource(dbName: string, contentType: ContentType,
+                          resource: string, data: string): AxiosPromise {
+        return this._request({
+            method: "PUT", url: `/${dbName}/${resource}`,
+            headers: {"content-type": contentType},
+            data
+        });
+    }
+
+    public readResource(dbName: string, contentType: ContentType,
+                        resource: string, params: ReadParams | QueryParams) {
+        return this._request({
+            method: "GET", url: `/${dbName}/${resource}`,
+            params
+        });
+    }
+
+    public history(dbName: string, contentType: ContentType, resource: string) {
+        return this._request({
+            method: "GET",
+            url: `/${dbName}/${resource}/history`, headers: {"accept": contentType}
+        })
+            .then(res => {
+                return res.data.history;
+            });
+    }
+
+    public diff(dbName: string, resource: string, params: DiffParams) {
+        return this._request({
+            method: "GET",
+            url: `/${dbName}/${resource}/diff`,
+            params
+        });
+    }
+
+    public postQuery(query: QueryParams) {
+        return this._request({url: '/', method: "POST", data: query});
+    }
+
+    public getEtag(dbName: string, contentType: ContentType, resource: string,
+                   params: ReadParams) {
+        return this._request({
+            method: "HEAD", url: `/${dbName}/${resource}`,
+            params, headers: {"accept": contentType}
+        });
+    }
+
+    public update(dbName: string, contentType: ContentType, resource: string,
+                  updateParams: UpdateParams) {
+        return this._request({
+            method: "POST",
+            url: `/${dbName}/${resource}`,
+            params: {nodeId: updateParams.nodeId, insert: updateParams.insert},
+            headers: {ETag: updateParams.etag, "content-type": contentType},
+            data: updateParams.data
+        });
+    }
+
+    public resourceDelete(dbName: string, contentType: ContentType, resource: string,
+                          nodeId: number | null, ETag: string | null): AxiosPromise {
+        if (nodeId) {
+            return this._request({
+                url: `/${dbName}/${resource}`,
+                method: "DELETE",
+                params: {nodeId},
+                headers: {ETag, "content-type": contentType}
+            });
+        } else {
+            return this._request({
+                url: `/${dbName}/${resource}`,
+                method: "DELETE",
+            })
         }
-        this.sirixInfo.databaseInfo.splice(0, this.sirixInfo.databaseInfo.length, ...res.data["databases"]);
-        return this.sirixInfo.databaseInfo;
-      });
-  }
-  /**
-   * delete
-   */
-  public async delete(): Promise<boolean> {
-    let res = await Axios.delete(this.sirixInfo.sirixUri,
-      { headers: { Authorization: `Bearer ${this.authData.access_token}` } });
-    if (res.status >= 400) {
-      console.error(res.status, res.data);
-      return false;
     }
-    await this.getInfo();
-    return true;
-  }
-  /**
-   * query
-   */
-  public query(
-    query: string,
-    startResultSeqIndex: number = undefined,
-    endResultSeqIndex: number = undefined
-  ) {
-    let queryObj = { query, startResultSeqIndex, endResultSeqIndex };
-    if (startResultSeqIndex === undefined) {
-      delete queryObj.startResultSeqIndex;
-    }
-    if (endResultSeqIndex) {
-      delete queryObj.endResultSeqIndex;
-    }
-    return Axios.post(this.sirixInfo.sirixUri, queryObj,
-      { headers: { Authorization: `Bearer ${this.authData.access_token}` } })
-      .then(res => {
-        if (res.status != 200) {
-          console.error(res.status, res.data);
-          return false;
-        }
-        return res.data;
-      })
-  }
 }
