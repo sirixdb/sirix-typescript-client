@@ -31,20 +31,22 @@ interface AuthData {
     session_state: string;
     scope: string;
 }
-export interface StringMap {
-    [key: string]: string | number;
-}
 declare type Revision = number | Date;
 interface ReadParams {
     nodeId?: number;
     maxLevel?: number;
-    withMetadata?: boolean | string;
+    withMetadata?: MetaType;
     revision?: number;
     "revision-timestamp"?: string;
     "start-revision"?: number;
     "end-revision"?: number;
     "start-revision-timestamp"?: string;
     "end-revision-timestamp"?: string;
+}
+declare enum MetaType {
+    ALL = "true",
+    KEY = "nodeKey",
+    KEYAndChild = "nodeKeyAndChildCount"
 }
 interface DiffParams {
     "first-revision"?: string | number;
@@ -57,6 +59,11 @@ interface UpdateParams {
     data: any;
     insert?: Insert;
     etag?: string;
+}
+interface QueryParams {
+    query: string;
+    startResultSeqIndex?: number;
+    endResultSeqIndex?: number;
 }
 interface Commit {
     revisionTimestamp: string;
@@ -118,4 +125,4 @@ interface MetaNode {
     key?: string;
     value: MetaNode[] | {} | [] | MetaNode | string | number | boolean | null;
 }
-export { DBType, ContentType, SirixInfo, DatabaseInfo, LoginInfo, AuthData, Revision, ReadParams, DiffParams, UpdateParams, Commit, DiffResponse, Diff, MetaNode, NodeType };
+export { DBType, ContentType, SirixInfo, DatabaseInfo, LoginInfo, AuthData, Revision, ReadParams, MetaType, DiffParams, UpdateParams, QueryParams, Commit, DiffResponse, Diff, MetaNode, NodeType };

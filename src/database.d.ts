@@ -10,6 +10,6 @@ export default class Database {
     private readonly contentType;
     create(): AxiosPromise;
     resource(name: string): Resource;
-    getInfo(withResources?: boolean): Promise<DatabaseInfo>;
+    getInfo(): Promise<DatabaseInfo>;
     delete(): AxiosPromise;
 }

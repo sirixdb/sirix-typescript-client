@@ -1,6 +1,6 @@
-import {AxiosPromise, AxiosResponse} from "axios";
+import {AxiosResponse} from "axios";
 
-import {contentType, Insert} from './constants';
+import {Insert} from './constants';
 
 import {
     Commit,
@@ -8,7 +8,9 @@ import {
     DBType,
     DiffParams,
     DiffResponse,
-    MetaNode, QueryParams,
+    MetaNode,
+    MetaType,
+    QueryParams,
     ReadParams,
     Revision,
     UpdateParams
@@ -28,7 +30,7 @@ export default class Resource {
     /**
      * create
      */
-    public create(data: string): AxiosPromise {
+    public create(data: string): Promise<AxiosResponse> {
         return this._client.createResource(this.dbName,
             this.contentType, this.name, data);
     }
@@ -45,7 +47,7 @@ export default class Resource {
         nodeId?: number,
         revision?: Revision | [Revision, Revision],
         maxLevel?: number
-    }): Promise<string | JSON> {
+    } | undefined): Promise<string | JSON> {
         const params = Resource._readParams(inputParams);
         return this._client.readResource(this.dbName, this.contentType,
             this.name, params)
@@ -60,10 +62,13 @@ export default class Resource {
     public readWithMetadata(inputParams: {
         nodeId?: number,
         revision?: Revision | [Revision, Revision],
-        maxLevel?: number
+        maxLevel?: number,
+        metaType?: MetaType
     }): Promise<MetaNode> {
-        const params = Resource._readParams(inputParams);
-        params["withMetadata"] = true;
+        const params = Resource._readParams({
+            ...inputParams,
+            metaType: inputParams.metaType ? inputParams.metaType : MetaType.ALL
+        });
         return this._client.readResource(this.dbName, this.contentType,
             this.name, params)
             .then(res => {
@@ -74,9 +79,10 @@ export default class Resource {
     private static _readParams(inputParams: {
         nodeId?: number,
         revision?: Revision | [Revision, Revision],
-        maxLevel?: number
+        maxLevel?: number,
+        metaType?: MetaType
     }): ReadParams {
-        let {nodeId, revision, maxLevel} = {...inputParams};
+        let {nodeId, revision, maxLevel, metaType} = {...inputParams};
         let params: ReadParams = {}
         if (nodeId) {
             params['nodeId'] = nodeId;
@@ -97,6 +103,9 @@ export default class Resource {
                 params['end-revision-timestamp'] = revision[1].toISOString();
             }
         }
+        if (metaType) {
+            params.withMetadata = metaType;
+        }
         return params;
     }
 
@@ -110,16 +119,18 @@ export default class Resource {
     /**
      * diff
      */
-    public diff(firstRevision: Revision, secondRevision: Revision, inputParams: {
+    public diff(firstRevision: Revision, secondRevision: Revision, inputParams?: {
         nodeId?: number,
         maxLevel?: number
     }): Promise<DiffResponse> {
         let params: DiffParams = {}
-        if (inputParams.nodeId) {
-            params.startNodeKey = inputParams.nodeId;
-        }
-        if (inputParams.maxLevel) {
-            params.maxDepth = inputParams.maxLevel;
+        if (inputParams) {
+            if (inputParams.nodeId) {
+                params.startNodeKey = inputParams.nodeId;
+            }
+            if (inputParams.maxLevel) {
+                params.maxDepth = inputParams.maxLevel;
+            }
         }
         if (typeof firstRevision === "number" && typeof secondRevision === "number") {
             params["first-revision"] = firstRevision;
@@ -130,7 +141,7 @@ export default class Resource {
         }
         return this._client.diff(this.dbName, this.name, params)
             .then(res => {
-                return res.data;
+                return res.data.diffs;
             });
     }
 

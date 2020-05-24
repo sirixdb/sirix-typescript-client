@@ -38,22 +38,24 @@ interface AuthData {
     scope: string
 }
 
-export interface StringMap {
-    [key: string]: string | number;
-}
-
 type Revision = number | Date
 
 interface ReadParams {
     nodeId?: number,
     maxLevel?: number,
-    withMetadata?: boolean | string,
+    withMetadata?: MetaType,
     revision?: number,
     "revision-timestamp"?: string,
     "start-revision"?: number,
     "end-revision"?: number,
     "start-revision-timestamp"?: string,
     "end-revision-timestamp"?: string
+}
+
+enum MetaType {
+    ALL = "true",
+    KEY = "nodeKey",
+    KEYAndChild = "nodeKeyAndChildCount"
 }
 
 interface DiffParams {
@@ -72,8 +74,8 @@ interface UpdateParams {
 
 interface QueryParams {
     query: string,
-    startResultSeqIndex: number,
-    endResultSeqIndex: number
+    startResultSeqIndex?: number,
+    endResultSeqIndex?: number
 }
 
 interface Commit {
@@ -160,6 +162,7 @@ export {
     AuthData,
     Revision,
     ReadParams,
+    MetaType,
     DiffParams,
     UpdateParams,
     QueryParams,

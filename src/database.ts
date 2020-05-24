@@ -29,17 +29,14 @@ export default class Database {
      * resource
      */
     public resource(name: string): Resource {
-        return null;
+        return new Resource(this.name, name, this.dbType, this.contentType,
+            this._client);
     }
 
     /**
      * getInfo
      */
-    public getInfo(withResources = false): Promise<DatabaseInfo> {
-        let params = {withResources};
-        if (!withResources) {
-            delete params.withResources;
-        }
+    public getInfo(): Promise<DatabaseInfo> {
         return this._client.getDatabaseInfo(this.name)
             .then(res => {
                 return res.data;

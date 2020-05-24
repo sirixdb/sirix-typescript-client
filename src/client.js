@@ -27,6 +27,7 @@ var Client = (function () {
     };
     Client.prototype.createDatabase = function (name, contentType) {
         return this._request({
+            url: "/" + name,
             method: "PUT",
             headers: { "content-type": contentType }
         });
@@ -51,10 +52,11 @@ var Client = (function () {
             return true;
         })
             .catch(function (err) {
-            if (err.status === 404) {
+            if (err.response.status === 404) {
                 return false;
             }
             else {
+                console.log(err);
                 throw Error(err);
             }
         });
@@ -81,7 +83,7 @@ var Client = (function () {
             headers: { "accept": contentType }
         })
             .then(function (res) {
-            return res.data;
+            return res.data.history;
         });
     };
     Client.prototype.diff = function (dbName, resource, params) {
@@ -92,7 +94,7 @@ var Client = (function () {
         });
     };
     Client.prototype.postQuery = function (query) {
-        return this._request({ url: '/', data: query });
+        return this._request({ url: '/', method: "POST", data: query });
     };
     Client.prototype.getEtag = function (dbName, contentType, resource, params) {
         return this._request({
@@ -114,6 +116,7 @@ var Client = (function () {
     Client.prototype.resourceDelete = function (dbName, contentType, resource, nodeId, ETag) {
         if (nodeId) {
             return this._request({
+                url: "/" + dbName + "/" + resource,
                 method: "DELETE",
                 params: { nodeId: nodeId },
                 headers: { ETag: ETag, "content-type": contentType }
@@ -121,6 +124,7 @@ var Client = (function () {
         }
         else {
             return this._request({
+                url: "/" + dbName + "/" + resource,
                 method: "DELETE",
             });
         }

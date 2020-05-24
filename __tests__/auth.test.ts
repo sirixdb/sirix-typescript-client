@@ -1,7 +1,7 @@
 import {mocked} from 'ts-jest/utils';
 
 jest.mock('axios');
-import axios, {AxiosRequestConfig, AxiosResponse} from 'axios';
+import axios, {AxiosRequestConfig} from 'axios';
 import Client from "../src/client";
 import {initClient} from '../src/auth'
 
@@ -40,8 +40,8 @@ describe("test authentication", () => {
         const client = new Client();
         await client.init(
             {username: "admin", password: "admin"},
-            "https://localhost:9443");
-        expect("https://localhost:9443/token").toMatch(sentUrl);
+            "http://localhost:9443");
+        expect("http://localhost:9443/token").toMatch(sentUrl);
         expect({username: "admin", password: "admin", grant_type: "password"}).toEqual(sentData);
         jest.runOnlyPendingTimers();
         client.shutdown();
@@ -57,7 +57,7 @@ describe("test authentication", () => {
         try {
             await client.init(
                 {username: "admin", password: "admin"},
-                "https://localhost:9443");
+                "http://localhost:9443");
         } catch (e) {
             expect(e.message).toEqual("failed to retrieve an access token using credentials");
         }
@@ -71,7 +71,7 @@ describe("test authentication", () => {
         const client = new Client();
         await client.init(
             {username: "admin", password: "admin"},
-            "https://localhost:9443");
+            "http://localhost:9443");
         mockedAxios.post.mockResolvedValue(Promise.resolve({status: 500}));
         setTimeout(() => {
             expect(debugSpy).toHaveBeenCalledTimes(4);
@@ -86,13 +86,13 @@ describe("test authentication", () => {
         mockedAxios.post.mockResolvedValue(Promise.resolve({status: 200, data: token}));
         const mockRequest = mockedAxios.request.mockResolvedValue(Promise.resolve({status: 200, data: {}}));
         const auth = await initClient({username: "admin", password: "admin"},
-            "https://localhost:9443");
+            "http://localhost:9443");
         const res = await auth.request({method: "GET", headers: {"content-type": "application/json"}});
         expect(res).toEqual({status: 200, data: {}});
         expect(mockRequest)
             .toHaveBeenCalledWith({
                 method: "GET",
-                baseURL: "https://localhost:9443",
+                baseURL: "http://localhost:9443",
                 headers: {
                     authorization: `${token.token_type} ${token.access_token}`,
                     "content-type": "application/json",

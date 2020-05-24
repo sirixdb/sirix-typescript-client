@@ -1,7 +1,6 @@
 import {initClient, request, shutdown} from "./auth";
-import {ContentType, DatabaseInfo, DBType, DiffParams, LoginInfo, QueryParams, ReadParams, UpdateParams} from "./info";
-import {AxiosPromise, AxiosResponse} from "axios";
-import {Insert} from "./constants";
+import {ContentType, DiffParams, LoginInfo, QueryParams, ReadParams, UpdateParams} from "./info";
+import {AxiosPromise} from "axios";
 
 export default class Client {
     private _request: request;
@@ -29,6 +28,7 @@ export default class Client {
 
     public createDatabase(name: string, contentType: ContentType): AxiosPromise {
         return this._request({
+            url: `/${name}`,
             method: "PUT",
             headers: {"content-type": contentType}
         })
@@ -55,9 +55,10 @@ export default class Client {
                 return true;
             })
             .catch(err => {
-                if (err.status === 404) {
+                if (err.response.status === 404) {
                     return false;
                 } else {
+                    console.log(err)
                     throw Error(err);
                 }
             });
@@ -86,7 +87,7 @@ export default class Client {
             url: `/${dbName}/${resource}/history`, headers: {"accept": contentType}
         })
             .then(res => {
-                return res.data;
+                return res.data.history;
             });
     }
 
@@ -98,8 +99,8 @@ export default class Client {
         });
     }
 
-    public postQuery(query: Map<string, number | string>) {
-        return this._request({url: '/', data: query});
+    public postQuery(query: QueryParams) {
+        return this._request({url: '/', method: "POST", data: query});
     }
 
     public getEtag(dbName: string, contentType: ContentType, resource: string,
@@ -125,12 +126,14 @@ export default class Client {
                           nodeId: number | null, ETag: string | null): AxiosPromise {
         if (nodeId) {
             return this._request({
+                url: `/${dbName}/${resource}`,
                 method: "DELETE",
                 params: {nodeId},
                 headers: {ETag, "content-type": contentType}
             });
         } else {
             return this._request({
+                url: `/${dbName}/${resource}`,
                 method: "DELETE",
             })
         }

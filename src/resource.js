@@ -48,6 +48,7 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 var constants_1 = require("./constants");
+var info_1 = require("./info");
 var Resource = (function () {
     function Resource(dbName, name, dbType, contentType, _client) {
         this.dbName = dbName;
@@ -70,15 +71,14 @@ var Resource = (function () {
         });
     };
     Resource.prototype.readWithMetadata = function (inputParams) {
-        var params = Resource._readParams(inputParams);
-        params["withMetadata"] = true;
+        var params = Resource._readParams(__assign(__assign({}, inputParams), { metaType: inputParams.metaType ? inputParams.metaType : info_1.MetaType.ALL }));
         return this._client.readResource(this.dbName, this.contentType, this.name, params)
             .then(function (res) {
             return res.data;
         });
     };
     Resource._readParams = function (inputParams) {
-        var _a = __assign({}, inputParams), nodeId = _a.nodeId, revision = _a.revision, maxLevel = _a.maxLevel;
+        var _a = __assign({}, inputParams), nodeId = _a.nodeId, revision = _a.revision, maxLevel = _a.maxLevel, metaType = _a.metaType;
         var params = {};
         if (nodeId) {
             params['nodeId'] = nodeId;
@@ -102,6 +102,9 @@ var Resource = (function () {
                 params['end-revision-timestamp'] = revision[1].toISOString();
             }
         }
+        if (metaType) {
+            params.withMetadata = metaType;
+        }
         return params;
     };
     Resource.prototype.history = function () {
@@ -109,11 +112,13 @@ var Resource = (function () {
     };
     Resource.prototype.diff = function (firstRevision, secondRevision, inputParams) {
         var params = {};
-        if (inputParams.nodeId) {
-            params.startNodeKey = inputParams.nodeId;
-        }
-        if (inputParams.maxLevel) {
-            params.maxDepth = inputParams.maxLevel;
+        if (inputParams) {
+            if (inputParams.nodeId) {
+                params.startNodeKey = inputParams.nodeId;
+            }
+            if (inputParams.maxLevel) {
+                params.maxDepth = inputParams.maxLevel;
+            }
         }
         if (typeof firstRevision === "number" && typeof secondRevision === "number") {
             params["first-revision"] = firstRevision;
@@ -125,7 +130,7 @@ var Resource = (function () {
         }
         return this._client.diff(this.dbName, this.name, params)
             .then(function (res) {
-            return res.data;
+            return res.data.diffs;
         });
     };
     Resource.prototype.getEtag = function (nodeId) {
@@ -152,6 +157,12 @@ var Resource = (function () {
                     case 2: return [2, this._client.update(this.dbName, this.contentType, this.name, updateParams)];
                 }
             });
+        });
+    };
+    Resource.prototype.query = function (queryParams) {
+        return this._client.readResource(this.dbName, this.contentType, this.name, queryParams)
+            .then(function (res) {
+            return res.data;
         });
     };
     Resource.prototype.delete = function (nodeId, ETag) {

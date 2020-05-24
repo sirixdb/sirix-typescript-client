@@ -1,6 +1,7 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 var info_1 = require("./info");
+var resource_1 = require("./resource");
 var Database = (function () {
     function Database(name, dbType, _client) {
         this.name = name;
@@ -17,14 +18,9 @@ var Database = (function () {
         return this._client.createDatabase(this.name, this.contentType);
     };
     Database.prototype.resource = function (name) {
-        return null;
+        return new resource_1.default(this.name, name, this.dbType, this.contentType, this._client);
     };
-    Database.prototype.getInfo = function (withResources) {
-        if (withResources === void 0) { withResources = false; }
-        var params = { withResources: withResources };
-        if (!withResources) {
-            delete params.withResources;
-        }
+    Database.prototype.getInfo = function () {
         return this._client.getDatabaseInfo(this.name)
             .then(function (res) {
             return res.data;

@@ -3,7 +3,7 @@ import Axios from 'axios';
 import Client from "./client";
 import Database from './database'
 
-import {DatabaseInfo, DBType, LoginInfo, StringMap} from './info'
+import {DatabaseInfo, DBType, LoginInfo, QueryParams} from './info'
 
 function sirixInit(loginInfo: LoginInfo, sirixUri: string): Promise<Sirix> {
     const sirix = new Sirix();
@@ -35,6 +35,10 @@ export default class Sirix {
         return this._client.init(loginInfo, sirixUri);
     }
 
+    public shutdown() {
+        this._client.shutdown()
+    }
+
     private readonly _client: Client;
 
     /**
@@ -47,7 +51,7 @@ export default class Sirix {
     /**
      * getInfo
      */
-    public getInfo(resources: boolean): Promise<DatabaseInfo[]> {
+    public getInfo(resources: boolean = true): Promise<DatabaseInfo[]> {
         return this._client.globalInfo(resources)
             .then(res => {
                 return res.data.databases as DatabaseInfo[];
@@ -57,16 +61,11 @@ export default class Sirix {
     /**
      * query
      */
-    public query(query: string, startResultSeqIndex: number | undefined,
-                 endResultSeqIndex: number | undefined) {
-        const queryObj: StringMap = {query, startResultSeqIndex, endResultSeqIndex};
-        Object.keys(queryObj).forEach(param => {
-            if (param === undefined) {
-                delete queryObj[param];
-            }
-        });
-        return this._client.postQuery(
-            queryObj as unknown as Map<string, string | number>);
+    public query(query: QueryParams) {
+        return this._client.postQuery(query)
+            .then(res => {
+                return res.data;
+            });
     }
 
     /**
