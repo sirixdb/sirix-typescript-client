@@ -5,7 +5,7 @@ import Database from './database'
 
 import {DatabaseInfo, DBType, LoginInfo, QueryParams} from './info'
 
-function sirixInit(loginInfo: LoginInfo, sirixUri: string): Promise<Sirix> {
+export function sirixInit(sirixUri: string, loginInfo: LoginInfo): Promise<Sirix> {
     const sirix = new Sirix();
     return sirix.init(loginInfo, sirixUri)
         .then(() => {
@@ -13,7 +13,7 @@ function sirixInit(loginInfo: LoginInfo, sirixUri: string): Promise<Sirix> {
         });
 }
 
-export default class Sirix {
+export class Sirix {
     /**
      * This class is the entrypoint to interacting with a SirixDB server.
      * It interacts with the root level of the server, and provides

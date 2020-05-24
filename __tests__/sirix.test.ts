@@ -1,4 +1,4 @@
-import Sirix from "../src/sirix";
+import {Sirix, sirixInit} from "../src/sirix";
 import {DBType} from "../src/info";
 import {dataForQuery, postQuery} from "../resources/data";
 
@@ -6,9 +6,8 @@ describe('test Sirix class', () => {
     let sirix: Sirix;
 
     beforeEach(async () => {
-        sirix = new Sirix();
-        await sirix.init({username: "admin", password: "admin"},
-            "http://localhost:9443");
+        sirix = await sirixInit("http://localhost:9443",
+            {username: "admin", password: "admin"});
         await sirix.deleteAll();
     });
     afterEach(async () => {

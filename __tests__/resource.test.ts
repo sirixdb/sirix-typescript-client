@@ -1,4 +1,4 @@
-import Sirix from "../src/sirix";
+import {Sirix, sirixInit} from "../src/sirix";
 import Database from "../src/database";
 import {DBType, MetaType} from "../src/info";
 import Resource from "../src/resource";
@@ -10,9 +10,8 @@ describe('test Resource class', () => {
     let resource: Resource;
 
     beforeEach(async () => {
-        sirix = new Sirix();
-        await sirix.init({username: "admin", password: "admin"},
-            "http://localhost:9443");
+        sirix = await sirixInit("http://localhost:9443",
+            {username: "admin", password: "admin"});
         await sirix.deleteAll();
         db = sirix.database("testing", DBType.JSON);
         resource = db.resource('test');

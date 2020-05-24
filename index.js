@@ -1,6 +1,7 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 var sirix_1 = require("./src/sirix");
-var auth_1 = require("./src/auth");
-var utils_1 = require("./src/utils");
-exports.default = { Sirix: sirix_1.default, Auth: auth_1.default, Insert: utils_1.Insert };
+var database_1 = require("./src/database");
+var resource_1 = require("./src/resource");
+var constants_1 = require("./src/constants");
+exports.default = { Sirix: sirix_1.Sirix, Database: database_1.default, Resource: resource_1.default, sirixInit: sirix_1.sirixInit, Insert: constants_1.Insert };

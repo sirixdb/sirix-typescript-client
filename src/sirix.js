@@ -1,14 +1,16 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
+exports.Sirix = exports.sirixInit = void 0;
 var client_1 = require("./client");
 var database_1 = require("./database");
-function sirixInit(loginInfo, sirixUri) {
+function sirixInit(sirixUri, loginInfo) {
     var sirix = new Sirix();
     return sirix.init(loginInfo, sirixUri)
         .then(function () {
         return sirix;
     });
 }
+exports.sirixInit = sirixInit;
 var Sirix = (function () {
     function Sirix() {
         this._client = new client_1.default();
@@ -46,4 +48,4 @@ var Sirix = (function () {
     };
     return Sirix;
 }());
-exports.default = Sirix;
+exports.Sirix = Sirix;

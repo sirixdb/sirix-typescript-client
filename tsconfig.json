@@ -16,6 +16,7 @@
         "./src/database.ts",
         "./src/info.ts",
         "./src/resource.ts",
-        "./src/sirix.ts"
+        "./src/sirix.ts",
+        "./index.ts"
     ]
 }

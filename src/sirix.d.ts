@@ -1,6 +1,7 @@
 import Database from './database';
 import { DatabaseInfo, DBType, LoginInfo, QueryParams } from './info';
-export default class Sirix {
+export declare function sirixInit(sirixUri: string, loginInfo: LoginInfo): Promise<Sirix>;
+export declare class Sirix {
     constructor();
     init(loginInfo: LoginInfo, sirixUri: string): Promise<void>;
     shutdown(): void;
