@@ -73,6 +73,7 @@ var Client = (function () {
         return this._request({
             method: "GET",
             url: "/" + dbName + "/" + resource,
+            headers: { "accept": contentType },
             params: params
         });
     };
