@@ -3,7 +3,9 @@ services:
   - docker
 language: node_js
 node_js:
-  - 11
+  - lts/*
+cache:
+  npm: false
 before_install:
   - bash ./test.sh
 script:
