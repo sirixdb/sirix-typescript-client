@@ -4,23 +4,22 @@ import {DBType, MetaType} from "../src/info";
 import Resource from "../src/resource";
 import {dataForQuery, resourceQuery} from "../resources/data"
 
-describe('test Resource class', () => {
-    let sirix: Sirix;
-    let db: Database;
-    let resource: Resource;
+let sirix: Sirix;
+let db: Database;
+let resource: Resource;
 
-    beforeEach(async done => {
+describe('test Resource class', () => {
+    beforeEach(async () => {
         sirix = await sirixInit("http://localhost:9443",
             {username: "admin", password: "admin"});
         await sirix.deleteAll();
         db = sirix.database("testing", DBType.JSON);
         resource = db.resource('test');
-        done();
+        console.log("beforeEach: ", resource);
     });
-    afterEach(async done => {
+    afterEach(async () => {
         await sirix.deleteAll();
         sirix.shutdown();
-        done();
     });
 
     test('Resource.create()', async () => {

@@ -7,17 +7,15 @@ describe('test Database class', () => {
     let sirix: Sirix;
     let db: Database;
 
-    beforeEach(async done => {
+    beforeEach(async () => {
         sirix = await sirixInit("http://localhost:9443",
             {username: "admin", password: "admin"});
         await sirix.deleteAll();
         db = sirix.database("testing", DBType.JSON);
-        done();
     });
-    afterEach(async done => {
+    afterEach(async () => {
         await sirix.deleteAll();
         sirix.shutdown();
-        done();
     });
 
     test('Database.create() and getInfo', async () => {
