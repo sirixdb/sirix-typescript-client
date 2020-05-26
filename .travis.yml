@@ -3,7 +3,7 @@ services:
   - docker
 language: node_js
 node_js:
-  - 14
+  - 11
 before_install:
   - bash ./test.sh
 script:
