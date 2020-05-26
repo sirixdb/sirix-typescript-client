@@ -5,14 +5,16 @@ import {dataForQuery, postQuery} from "../resources/data";
 describe('test Sirix class', () => {
     let sirix: Sirix;
 
-    beforeEach(async () => {
+    beforeEach(async done => {
         sirix = await sirixInit("http://localhost:9443",
             {username: "admin", password: "admin"});
         await sirix.deleteAll();
+        done();
     });
-    afterEach(async () => {
+    afterEach(async done => {
         await sirix.deleteAll();
         sirix.shutdown();
+        done();
     })
 
     test('getInfo', async () => {
