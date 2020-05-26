@@ -9,5 +9,4 @@ cache:
 before_install:
   - bash ./test.sh
 script:
-  - npm run build
   - npm run test
