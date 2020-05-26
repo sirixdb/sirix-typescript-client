@@ -15,6 +15,7 @@ describe('test Resource class', () => {
         await sirix.deleteAll();
         db = sirix.database("testing", DBType.JSON);
         resource = db.resource('test');
+        console.log("beforeEach: ", resource);
     });
     afterEach(async () => {
         await sirix.deleteAll();
