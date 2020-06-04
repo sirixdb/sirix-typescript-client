@@ -55,3 +55,6 @@ typings/
 
 .vscode
 .idea
+
+src/*.js
+src/*.d.ts
