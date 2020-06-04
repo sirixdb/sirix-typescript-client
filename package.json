@@ -2,8 +2,7 @@
   "name": "sirix",
   "version": "1.0.0",
   "description": "A typescript client library for interacting with SirixDB",
-  "main": "./index.js",
-  "types": "./index.d.ts",
+  "main": "./index.ts",
   "type": "commonjs",
   "scripts": {
     "build": "tsc",
