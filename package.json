@@ -13,6 +13,7 @@
   "dependencies": {
     "@types/xmldom": "^0.1.29",
     "axios": "^0.19.2",
+    "fetch-ponyfill": "^6.1.1",
     "xmldom": "^0.3.0"
   },
   "devDependencies": {

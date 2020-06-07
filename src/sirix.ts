@@ -54,7 +54,10 @@ export class Sirix {
     public getInfo(resources: boolean = true): Promise<DatabaseInfo[]> {
         return this._client.globalInfo(resources)
             .then(res => {
-                return res.data.databases as DatabaseInfo[];
+                return res.json()
+                    .then(data => {
+                        return data.databases as DatabaseInfo[]
+                    });
             });
     }
 
@@ -64,7 +67,7 @@ export class Sirix {
     public query(query: QueryParams) {
         return this._client.postQuery(query)
             .then(res => {
-                return res.data;
+                return res.text();
             });
     }
 

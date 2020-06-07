@@ -14,8 +14,12 @@ import {
     ReadParams,
     Revision,
     UpdateParams
-} from './info'
+} from './info';
 import Client from "./client";
+
+import {DOMParser} from "xmldom";
+
+const domParser = new DOMParser();
 
 export default class Resource {
     constructor(
@@ -30,7 +34,7 @@ export default class Resource {
     /**
      * create
      */
-    public create(data: string): Promise<AxiosResponse> {
+    public create(data: string): Promise<Response> {
         return this._client.createResource(this.dbName,
             this.contentType, this.name, data);
     }
@@ -47,12 +51,23 @@ export default class Resource {
         nodeId?: number,
         revision?: Revision | [Revision, Revision],
         maxLevel?: number
-    } | undefined): Promise<string | JSON> {
-        const params = Resource._readParams(inputParams);
+    } | undefined): Promise<JSON | Document> {
+        const params = Resource._readParams(inputParams || {});
         return this._client.readResource(this.dbName, this.contentType,
-            this.name, params)
+            this.name, {...params, prettyPrint: false})
             .then(res => {
-                return res.data;
+                if (!res.ok) {
+                    res.text().then(text => {
+                        throw new Error(text);
+                    });
+                } else if (this.dbType === DBType.JSON) {
+                    return res.json();
+                } else {
+                    return res.text()
+                        .then(text => {
+                            return domParser.parseFromString(text, "application/xml");
+                        })
+                }
             });
     }
 
@@ -72,7 +87,13 @@ export default class Resource {
         return this._client.readResource(this.dbName, this.contentType,
             this.name, params)
             .then(res => {
-                return res.data;
+                if (!res.ok) {
+                    res.text().then(text => {
+                        throw new Error(text);
+                    })
+                } else {
+                    return res.json();
+                }
             });
     }
 
@@ -141,22 +162,30 @@ export default class Resource {
         }
         return this._client.diff(this.dbName, this.name, params)
             .then(res => {
-                return res.data.diffs;
+                return res.json()
+                    .then(data => {
+                        return data.diffs;
+                    })
             });
     }
 
-    public getEtag(nodeId: number): Promise<string> {
+    public getEtag(nodeId: number): Promise<string | undefined> {
         return this._client.getEtag(this.dbName, this.contentType, this.name,
             {nodeId})
             .then(res => {
-                return res.headers.etag as string;
+                const etag = res.headers.get("etag");
+                if (etag) {
+                    return etag;
+                } else {
+                    return undefined;
+                }
             });
     }
 
     /**
      * update
      */
-    public async update(updateParams: UpdateParams): Promise<AxiosResponse> {
+    public async update(updateParams: UpdateParams): Promise<Response> {
         if (updateParams.insert === undefined) {
             updateParams.insert = Insert.CHILD;
         }
@@ -170,18 +199,18 @@ export default class Resource {
     /**
      * query
      */
-    public query(queryParams: QueryParams): Promise<string> {
+    public query(queryParams: QueryParams) {
         return this._client.readResource(this.dbName, this.contentType, this.name,
             queryParams)
             .then(res => {
-                return res.data;
+                return res.json();
             });
     }
 
     /**
      * delete
      */
-    public async delete(nodeId: number | null, ETag: string | null): Promise<AxiosResponse> {
+    public async delete(nodeId: number | null, ETag: string | null): Promise<Response> {
         if (!ETag && nodeId) {
             ETag = await this.getEtag(nodeId);
         }

@@ -21,7 +21,7 @@ export default class Database {
     /**
      * create
      */
-    public create(): AxiosPromise {
+    public create(): Promise<Response> {
         return this._client.createDatabase(this.name, this.contentType);
     }
 
@@ -39,14 +39,14 @@ export default class Database {
     public getInfo(): Promise<DatabaseInfo> {
         return this._client.getDatabaseInfo(this.name)
             .then(res => {
-                return res.data;
+                return res.json();
             });
     }
 
     /**
      * delete
      */
-    public delete(): AxiosPromise {
+    public delete(): Promise<Response> {
         return this._client.deleteDatabase(this.name);
     }
 }

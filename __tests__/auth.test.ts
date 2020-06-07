@@ -1,7 +1,11 @@
-import {mocked} from 'ts-jest/utils';
-
-jest.mock('axios');
-import axios, {AxiosRequestConfig} from 'axios';
+import {mocked} from "ts-jest/utils";
+let mockedFetch = jest.fn();
+jest.mock('fetch-ponyfill', () => {
+    return () => ({fetch: mockedFetch})
+});
+const Response = jest.requireActual('fetch-ponyfill')().Response;
+import fetchPonyfill from "fetch-ponyfill";
+const {fetch} = fetchPonyfill();
 import Client from "../src/client";
 import {initClient} from '../src/auth'
 
@@ -17,7 +21,7 @@ let token = {
     "expires_at": 1589329400037
 };
 
-const mockedAxios = mocked(axios, true);
+mockedFetch = mocked(mockedFetch, true);
 
 
 describe("test authentication", () => {
@@ -31,26 +35,29 @@ describe("test authentication", () => {
 
     test('test auth with credentials, refresh with access token', async () => {
         let sentUrl: string;
-        let sentData: Map<string, string>;
-        const m = mockedAxios.post.mockImplementation((url: string, data?: any, config?: AxiosRequestConfig) => {
-            sentUrl = url;
-            sentData = data;
-            return Promise.resolve({status: 200, data: token});
+        let sentData: string;
+        const m = mockedFetch.mockImplementation(async (requestInfo: RequestInfo,
+                                                              requestInit: RequestInit): Promise<Response> => {
+            sentUrl = requestInfo as string;
+            sentData = requestInit.body as string;
+            return new Response(JSON.stringify(token), {status: 200});
         });
         const client = new Client();
         await client.init(
             {username: "admin", password: "admin"},
             "http://localhost:9443");
         expect("http://localhost:9443/token").toMatch(sentUrl);
-        expect({username: "admin", password: "admin", grant_type: "password"}).toEqual(sentData);
+        expect(sentData).toEqual(JSON.stringify({username: "admin", password: "admin", grant_type: "password"}));
         jest.runOnlyPendingTimers();
         client.shutdown();
         expect(m.mock.calls.length).toEqual(2);
-        expect(sentData).toEqual({refresh_token: token.refresh_token, grant_type: "refresh_token"});
+        expect(sentData).toEqual(JSON.stringify({refresh_token: token.refresh_token, grant_type: "refresh_token"}));
     });
 
     test('auth with credentials failure', async () => {
-        mockedAxios.post.mockResolvedValue(Promise.resolve({status: 401, data: "invalid credentials"}));
+        mockedFetch.mockResolvedValue(Promise.resolve(
+            new Response("invalid credentials", {status: 401})
+        ));
         const client = new Client();
         const errorSpy = jest.spyOn(console, 'error');
         const debugSpy = jest.spyOn(console, 'debug');
@@ -66,16 +73,20 @@ describe("test authentication", () => {
     });
 
     test('auth refresh retry', async () => {
-        mockedAxios.post.mockResolvedValue(Promise.resolve({status: 200, data: token}));
+        mockedFetch.mockResolvedValue(Promise.resolve(new Response(
+            JSON.stringify(token), {status: 200})
+        ));
         const debugSpy = jest.spyOn(console, 'debug');
         const client = new Client();
         await client.init(
             {username: "admin", password: "admin"},
             "http://localhost:9443");
-        mockedAxios.post.mockResolvedValue(Promise.resolve({status: 500}));
+        mockedFetch.mockResolvedValue(Promise.resolve(
+            new Response(JSON.stringify({status: 500}))
+        ));
         setTimeout(() => {
             expect(debugSpy).toHaveBeenCalledTimes(4);
-            expect(mockedAxios.mock).toHaveBeenCalledWith({
+            expect(mockedFetch.mock).toHaveBeenCalledWith({
                 refresh_token: token.refresh_token,
                 grant_type: "refresh_token"
             });
@@ -83,16 +94,20 @@ describe("test authentication", () => {
     });
 
     test('adds auth header and baseUrl', async () => {
-        mockedAxios.post.mockResolvedValue(Promise.resolve({status: 200, data: token}));
-        const mockRequest = mockedAxios.request.mockResolvedValue(Promise.resolve({status: 200, data: {}}));
+        mockedFetch.mockResolvedValue(Promise.resolve(
+            new Response(JSON.stringify(token), {status: 200})
+        ));
         const auth = await initClient({username: "admin", password: "admin"},
             "http://localhost:9443");
-        const res = await auth.request({method: "GET", headers: {"content-type": "application/json"}});
-        expect(res).toEqual({status: 200, data: {}});
+        mockedFetch.mockClear();
+        const mockRequest = mockedFetch.mockResolvedValue(Promise.resolve(
+            new Response('{}', {status: 200})
+        ));
+        const res = await auth.request("/", {method: "GET", headers: {"content-type": "application/json"}});
+        expect(await res.json()).toEqual({});
         expect(mockRequest)
-            .toHaveBeenCalledWith({
+            .toHaveBeenCalledWith("http://localhost:9443/", {
                 method: "GET",
-                baseURL: "http://localhost:9443",
                 headers: {
                     authorization: `${token.token_type} ${token.access_token}`,
                     "content-type": "application/json",

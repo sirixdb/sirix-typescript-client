@@ -1,7 +1,9 @@
-import {AuthData, LoginInfo} from "./info";
-import Axios, {AxiosPromise, AxiosRequestConfig} from "axios";
+import {AuthData, LoginInfo, Params} from "./info";
+import fetchPonyfill from "fetch-ponyfill";
 
-export type request = (config: AxiosRequestConfig) => AxiosPromise;
+const {fetch} = fetchPonyfill();
+
+export type request = (urlString: string, requestInit: RequestInit, params?: Params) => Promise<Response>;
 export type shutdown = () => void;
 
 interface Auth {
@@ -14,16 +16,26 @@ export function initClient(loginInfo: LoginInfo, sirixUri: string): Promise<Auth
     let timeout: NodeJS.Timeout | number;
 
     function getTokenWithCredentials() {
-        return Axios.post(`${sirixUri}/token`, {...loginInfo, grant_type: "password"})
+        return fetch(`${sirixUri}/token`, {
+            method: "POST",
+            mode: "cors",
+            body: JSON.stringify({...loginInfo, grant_type: "password"})
+        })
             .then(res => {
-                if (res.status !== 200) {
-                    console.error(res.status, res.data);
-                    console.debug("failed to retrieve an access token using credentials. aborting");
-                    throw Error("failed to retrieve an access token using credentials");
+                if (!res.ok) {
+                    res.text()
+                        .then(text => {
+                            console.error(res.status, text);
+                            console.debug("failed to retrieve an access token using credentials. aborting");
+                            throw Error("failed to retrieve an access token using credentials");
+                        });
+                } else {
+                    return res.json().then(data => {
+                        authData = data as AuthData;
+                        shutdown();
+                        timeout = setTimeout(refreshAndSetTimeout, (authData.expires_in - 10) * 1000);
+                    });
                 }
-                authData = res.data as AuthData;
-                shutdown();
-                timeout = setTimeout(refreshAndSetTimeout, (authData.expires_in - 10) * 1000);
             });
     }
 
@@ -47,16 +59,18 @@ export function initClient(loginInfo: LoginInfo, sirixUri: string): Promise<Auth
     }
 
     function refreshClient(authData: AuthData, sirixUri: string): Promise<AuthData | undefined> {
-        return Axios.post(`${sirixUri}/token`,
-            {refresh_token: authData.refresh_token, grant_type: 'refresh_token'})
-            .then(res => {
+        return fetch(`${sirixUri}/token`, {
+            method: "POST",
+            mode: "cors",
+            body: JSON.stringify({refresh_token: authData.refresh_token, grant_type: 'refresh_token'})
+        }).then(res => {
                 if (res.status === 200) {
-                    return res.data;
+                    return res.json();
                 }
                 return undefined;
             })
-            .catch(res => {
-                console.error(res.status, res.data);
+            .catch(err => {
+                console.error(err);
                 return undefined;
             });
     }
@@ -65,18 +79,20 @@ export function initClient(loginInfo: LoginInfo, sirixUri: string): Promise<Auth
         clearTimeout(timeout as number);
     }
 
-    function request(config: AxiosRequestConfig) {
-        if (typeof config.headers === "object") {
-            config.headers = {
-                ...config.headers,
+    function request(urlString: string, requestInit: RequestInit, params: Params = {}) {
+        if (typeof requestInit.headers === "object") {
+            requestInit.headers = {
+                ...requestInit.headers,
                 authorization: `${authData.token_type} ${authData.access_token}`
             };
         } else {
-            config.headers = {
+            requestInit.headers = {
                 authorization: `${authData.token_type} ${authData.access_token}`
             }
         }
-        return Axios.request({...config, baseURL: sirixUri});
+        const url = new URL(urlString, sirixUri)
+        Object.keys(params).forEach(key => url.searchParams.append(key, params[key]));
+        return fetch(url.toString(), requestInit);
     }
 
     return getTokenWithCredentials()

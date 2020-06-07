@@ -34,6 +34,6 @@ describe('test Sirix class', () => {
             .resource("test");
         await resource.create(JSON.stringify(dataForQuery));
         const res = await sirix.query({query: postQuery});
-        expect(res).toEqual({"rest": [6]});
+        expect(res).toEqual('{"rest":[6]}');
     });
 });

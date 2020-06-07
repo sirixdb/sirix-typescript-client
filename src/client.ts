@@ -1,6 +1,5 @@
 import {initClient, request, shutdown} from "./auth";
-import {ContentType, DiffParams, LoginInfo, QueryParams, ReadParams, UpdateParams} from "./info";
-import {AxiosPromise} from "axios";
+import {Commit, ContentType, DiffParams, LoginInfo, Params, QueryParams, ReadParams, UpdateParams} from "./info";
 
 export default class Client {
     private _request: request;
@@ -14,128 +13,114 @@ export default class Client {
             });
     }
 
-    public globalInfo(resources: boolean = true): AxiosPromise {
+    public globalInfo(resources: boolean = true): Promise<Response> {
         let params = {};
         if (resources) {
             params = {"withResources": true};
         }
-        return this._request({method: "GET", url: "/", params});
+        return this._request("/", {method: "GET"}, params);
     }
 
-    public deleteAll(): AxiosPromise {
-        return this._request({method: "DELETE", url: "/"});
+    public deleteAll(): Promise<Response> {
+        return this._request("/", {method: "DELETE"});
     }
 
-    public createDatabase(name: string, contentType: ContentType): AxiosPromise {
-        return this._request({
-            url: `/${name}`,
+    public createDatabase(name: string, contentType: ContentType): Promise<Response> {
+        return this._request(`/${name}`, {
             method: "PUT",
             headers: {"content-type": contentType}
         })
     }
 
-    public getDatabaseInfo(name: string): AxiosPromise {
-        return this._request({
+    public getDatabaseInfo(name: string): Promise<Response> {
+        return this._request(`/${name}`, {
             method: "GET",
-            url: `/${name}`, headers: {"accept": ContentType.JSON}
+            headers: {"accept": ContentType.JSON}
         });
     }
 
-    public deleteDatabase(name: string): AxiosPromise {
-        return this._request({method: "DELETE", url: `/${name}`});
+    public deleteDatabase(name: string): Promise<Response> {
+        return this._request(`/${name}`, {method: "DELETE"});
     }
 
     public resourceExists(dbName: string, contentType: ContentType,
                           resource: string): Promise<boolean> {
-        return this._request({
+        return this._request(`/${dbName}/${resource}`, {
             method: "HEAD",
-            url: `/${dbName}/${resource}`, headers: {"accept": ContentType}
+            headers: {"accept": contentType}
         })
-            .then(() => {
-                return true;
-            })
-            .catch(err => {
-                if (err.response.status === 404) {
-                    return false;
-                } else {
-                    console.log(err)
-                    throw Error(err);
-                }
+            .then(res => {
+                return res.ok;
             });
     }
 
     public createResource(dbName: string, contentType: ContentType,
-                          resource: string, data: string): AxiosPromise {
-        return this._request({
-            method: "PUT", url: `/${dbName}/${resource}`,
+                          resource: string, body: string): Promise<Response> {
+        return this._request(`/${dbName}/${resource}`, {
+            method: "PUT",
             headers: {"content-type": contentType},
-            data
+            body
         });
     }
 
     public readResource(dbName: string, contentType: ContentType,
-                        resource: string, params: ReadParams | QueryParams) {
-        return this._request({
-            method: "GET", url: `/${dbName}/${resource}`,
-            params
-        });
+                        resource: string, params: ReadParams | QueryParams): Promise<Response> {
+        return this._request(`/${dbName}/${resource}`, {
+            method: "GET",
+            headers: {"accept": contentType},
+        }, params as Params);
     }
 
-    public history(dbName: string, contentType: ContentType, resource: string) {
-        return this._request({
+    public history(dbName: string, contentType: ContentType, resource: string): Promise<Commit[]> {
+        return this._request(`/${dbName}/${resource}/history`, {
             method: "GET",
-            url: `/${dbName}/${resource}/history`, headers: {"accept": contentType}
+            headers: {"accept": contentType}
         })
             .then(res => {
-                return res.data.history;
+                return res.json().then(data => {
+                    return data.history
+                });
             });
     }
 
-    public diff(dbName: string, resource: string, params: DiffParams) {
-        return this._request({
+    public diff(dbName: string, resource: string, params: DiffParams): Promise<Response> {
+        return this._request(`/${dbName}/${resource}/diff`, {
             method: "GET",
-            url: `/${dbName}/${resource}/diff`,
-            params
-        });
+        }, params as Params);
     }
 
-    public postQuery(query: QueryParams) {
-        return this._request({url: '/', method: "POST", data: query});
+    public postQuery(query: QueryParams): Promise<Response> {
+        return this._request('/', {method: "POST", body: JSON.stringify(query)});
     }
 
     public getEtag(dbName: string, contentType: ContentType, resource: string,
                    params: ReadParams) {
-        return this._request({
-            method: "HEAD", url: `/${dbName}/${resource}`,
-            params, headers: {"accept": contentType}
-        });
+        return this._request(`/${dbName}/${resource}`, {
+            method: "HEAD",
+            headers: {"accept": contentType}
+        }, params as Params);
     }
 
     public update(dbName: string, contentType: ContentType, resource: string,
-                  updateParams: UpdateParams) {
-        return this._request({
+                  updateParams: UpdateParams): Promise<Response> {
+        return this._request(`/${dbName}/${resource}`, {
             method: "POST",
-            url: `/${dbName}/${resource}`,
-            params: {nodeId: updateParams.nodeId, insert: updateParams.insert},
             headers: {ETag: updateParams.etag, "content-type": contentType},
-            data: updateParams.data
-        });
+            body: updateParams.data
+        }, {nodeId: updateParams.nodeId.toString(), insert: updateParams.insert});
     }
 
     public resourceDelete(dbName: string, contentType: ContentType, resource: string,
-                          nodeId: number | null, ETag: string | null): AxiosPromise {
+                          nodeId: number | null, ETag: string | null): Promise<Response> {
         if (nodeId) {
-            return this._request({
-                url: `/${dbName}/${resource}`,
+            return this._request(`/${dbName}/${resource}`, {
                 method: "DELETE",
-                params: {nodeId},
                 headers: {ETag, "content-type": contentType}
-            });
+            }, {nodeId: nodeId.toString()});
         } else {
-            return this._request({
-                url: `/${dbName}/${resource}`,
+            return this._request(`/${dbName}/${resource}`, {
                 method: "DELETE",
-            })
+            });
         }
     }
 }

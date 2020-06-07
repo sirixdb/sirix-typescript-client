@@ -38,12 +38,18 @@ interface AuthData {
     scope: string
 }
 
+
+interface Params {
+    [key: string]: string;
+}
+
 type Revision = number | Date
 
 interface ReadParams {
     nodeId?: number,
     maxLevel?: number,
     withMetadata?: MetaType,
+    prettyPrint?: boolean,
     revision?: number,
     "revision-timestamp"?: string,
     "start-revision"?: number,
@@ -161,6 +167,7 @@ export {
     LoginInfo,
     AuthData,
     Revision,
+    Params,
     ReadParams,
     MetaType,
     DiffParams,
