@@ -1,12 +1,6 @@
 dist: bionic
-services:
-  - docker
 language: node_js
 node_js:
   - lts/*
-cache:
-  npm: false
-before_install:
-  - bash ./test.sh
 script:
   - npm run test
