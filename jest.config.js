@@ -5,5 +5,8 @@ module.exports = {
   collectCoverage: true,
   collectCoverageFrom: [
       './src/*(?<!.d).ts'
+  ],
+  testPathIgnorePatterns: [
+      "./__tests__/xml.test.ts"
   ]
 };

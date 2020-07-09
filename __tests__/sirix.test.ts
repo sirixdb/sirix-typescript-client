@@ -1,38 +1,47 @@
+import {mocked} from "ts-jest/utils";
+
+let mockedFetch = jest.fn();
+jest.mock('fetch-ponyfill', () => {
+    return () => ({fetch: mockedFetch})
+});
+const Response = jest.requireActual('fetch-ponyfill')().Response;
+mockedFetch = mocked(mockedFetch, true);
+
 import {Sirix, sirixInit} from "../src/sirix";
-import {DBType} from "../src/info";
-import {dataForQuery, postQuery} from "../resources/data";
+import {token, postQuery} from "../resources/data";
 
 describe('test Sirix class', () => {
     let sirix: Sirix;
 
     beforeEach(async () => {
+        mockedFetch.mockImplementationOnce(async (requestInfo: RequestInfo,
+                                                  requestInit: RequestInit): Promise<Response> => {
+            return new Response(JSON.stringify(token), {status: 200});
+        });
         sirix = await sirixInit("http://localhost:9443",
             {username: "admin", password: "admin"});
-        await sirix.deleteAll();
     });
     afterEach(async () => {
-        await sirix.deleteAll();
         sirix.shutdown();
     })
 
     test('getInfo', async () => {
-        const data = await sirix.getInfo();
-        expect(data).toEqual([]);
-        const db = sirix.database("testing", DBType.JSON);
-        await db.create();
-        const resp = await sirix.getInfo();
-        expect(resp).toEqual([{
-            "name": "testing",
-            "resources": [],
-            "type": "json"
-        }]);
-        await sirix.deleteAll();
+        // @ts-ignore
+        const data = {databases: []};
+        mockedFetch.mockImplementationOnce(async (requestInfo: RequestInfo, requestInit: RequestInit): Promise<Response> => {
+            expect(requestInfo).toEqual("http://localhost:9443/?withResources=true");
+            return new Response(JSON.stringify(data), {status: 200});
+        });
+        const res = await sirix.getInfo();
+        expect(res).toEqual([]);
     });
 
     test('Sirix.query()', async () => {
-        const resource = sirix.database("testing", DBType.JSON)
-            .resource("test");
-        await resource.create(JSON.stringify(dataForQuery));
+        mockedFetch.mockImplementationOnce(async (requestInfo: RequestInfo, requestInit: RequestInit): Promise<Response> => {
+            expect(requestInfo).toEqual("http://localhost:9443/");
+            expect(requestInit.body).toEqual(JSON.stringify({query: postQuery}));
+            return new Response('{"rest":[6]}', {status: 200});
+        });
         const res = await sirix.query({query: postQuery});
         expect(res).toEqual('{"rest":[6]}');
     });

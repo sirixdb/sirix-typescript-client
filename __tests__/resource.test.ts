@@ -1,104 +1,158 @@
+import {mocked} from "ts-jest/utils";
+
+let mockedFetch = jest.fn();
+jest.mock('fetch-ponyfill', () => {
+    return () => ({fetch: mockedFetch})
+});
+const Response = jest.requireActual('fetch-ponyfill')().Response;
+mockedFetch = mocked(mockedFetch, true);
+
 import {Sirix, sirixInit} from "../src/sirix";
 import Database from "../src/database";
 import {DBType, MetaType} from "../src/info";
 import Resource from "../src/resource";
-import {dataForQuery, resourceQuery} from "../resources/data"
+import {token, resourceQuery} from "../resources/data"
 
-let sirix: Sirix;
-let db: Database;
-let resource: Resource;
 
 describe('test Resource class', () => {
+    let sirix: Sirix;
+    let db: Database;
+    let resource: Resource;
+
     beforeEach(async () => {
+        mockedFetch.mockImplementationOnce(async (requestInfo: RequestInfo,
+                                                  requestInit: RequestInit): Promise<Response> => {
+            return new Response(JSON.stringify(token), {status: 200});
+        });
         sirix = await sirixInit("http://localhost:9443",
             {username: "admin", password: "admin"});
-        await sirix.deleteAll();
         db = sirix.database("testing", DBType.JSON);
         resource = db.resource('test');
     });
     afterEach(async () => {
-        await sirix.deleteAll();
         sirix.shutdown();
     });
 
     test('Resource.create()', async () => {
+        mockedFetch.mockImplementationOnce(async (requestInfo: RequestInfo, requestInit: RequestInit): Promise<Response> => {
+            expect(requestInfo).toEqual("http://localhost:9443/testing/test");
+            expect(requestInit.method).toEqual("PUT");
+            expect(requestInit.body).toEqual("[]");
+            return new Response('[]', {status: 200});
+        });
         const res = await resource.create('[]');
         expect(await res.json()).toEqual([]);
     });
 
     test('Resource.query()', async () => {
-        await resource.create(JSON.stringify(dataForQuery));
+        const url = new URL("http://localhost:9443/testing/test");
+        url.searchParams.append("query", resourceQuery)
+        mockedFetch.mockImplementationOnce(async (requestInfo: RequestInfo, requestInit: RequestInit): Promise<Response> => {
+            expect(requestInfo).toEqual(url.toString());
+            expect(requestInit.method).toEqual("GET");
+            return new Response(JSON.stringify({"rest": [6]}), {status: 200});
+        });
         const res = await resource.query({query: resourceQuery});
         expect(res).toEqual({"rest": [6]});
     });
 
     test('Resource.delete()', async () => {
-        await resource.create('[]');
+        mockedFetch.mockImplementationOnce(async (requestInfo: RequestInfo, requestInit: RequestInit): Promise<Response> => {
+            expect(requestInfo).toEqual("http://localhost:9443/testing/test");
+            expect(requestInit.method).toEqual("DELETE");
+            return new Response(null, {status: 200});
+        });
         await resource.delete(null, null);
-        expect(await resource.exists()).toBeFalsy();
     });
 
     test('Resource.delete() non-existent', async () => {
+        mockedFetch.mockImplementationOnce(async (requestInfo: RequestInfo, requestInit: RequestInit): Promise<Response> => {
+            return new Response(null, {status: 500});
+        });
         const res = await resource.delete(null, null);
-        await expect(res.ok).toBeFalsy();
+        expect(res.ok).toBeFalsy();
     });
 
     test('Resource.read()', async () => {
-        await resource.create('[]');
+        mockedFetch.mockImplementationOnce(async (requestInfo: RequestInfo, requestInit: RequestInit): Promise<Response> => {
+            return new Response("[]", {status: 200});
+        });
         const res = await resource.read({});
         expect(res).toEqual([]);
     });
 
     test('Resource.getEtag()', async () => {
-        await resource.create('[]');
+        mockedFetch.mockImplementationOnce(async (requestInfo: RequestInfo, requestInit: RequestInit): Promise<Response> => {
+            expect(requestInit.method).toEqual("HEAD");
+            return new Response(null, {status: 200, headers: {"etag": "blah"}});
+        });
         const etag = await resource.getEtag(1);
-        expect(typeof etag === "string");
+        expect(etag).toEqual("blah");
     });
 
     test('Resource.getEtag() non-existent', async () => {
-        await resource.create('[]');
+        mockedFetch.mockImplementationOnce(async (requestInfo: RequestInfo, requestInit: RequestInit): Promise<Response> => {
+            return new Response(null, {status: 500});
+        });
         const res = await resource.getEtag(2);
         await expect(res).toBeUndefined();
     });
 
-/*    test('Resource.delete() by nodeId', async () => {
-        await resource.create('[]');
-        await resource.delete(1, null);
-        const res = await resource.delete(1, null);
-        expect(res.ok).toBeFalsy();
-    });
+    /*    test('Resource.delete() by nodeId', async () => {
+            await resource.create('[]');
+            await resource.delete(1, null);
+            const res = await resource.delete(1, null);
+            expect(res.ok).toBeFalsy();
+        });
 
-    test('Resource.delete() with etag', async () => {
-        await resource.create('[]');
-        const etag = await resource.getEtag(1);
-        await resource.delete(1, etag);
-        const res = await resource.delete(1, null);
-        await expect(res.ok).toBeFalsy();
-    });
-*/
+        test('Resource.delete() with etag', async () => {
+            await resource.create('[]');
+            const etag = await resource.getEtag(1);
+            await resource.delete(1, etag);
+            const res = await resource.delete(1, null);
+            await expect(res.ok).toBeFalsy();
+        });
+    */
     test('Resource.update() with etag', async () => {
-        await resource.create('[]');
-        const etag = await resource.getEtag(1);
+        const etag = "blah";
+        mockedFetch.mockImplementationOnce(async (requestInfo: RequestInfo, requestInit: RequestInit): Promise<Response> => {
+            expect(requestInit.body).toEqual('{}');
+            expect(requestInfo).toEqual("http://localhost:9443/testing/test?nodeId=1&insert=asFirstChild");
+            // @ts-ignore
+            expect(requestInit.headers.ETag).toEqual(etag);
+            return new Response(null, {status: 200});
+        });
         await resource.update({nodeId: 1, data: '{}', etag});
-        await expect(await resource.read({})).toEqual([{}]);
     });
 
     test('Resource.update() by nodeId', async () => {
-        await resource.create('[]');
+        const etag = "blah";
+        mockedFetch.mockImplementationOnce(async (requestInfo: RequestInfo, requestInit: RequestInit): Promise<Response> => {
+            return new Response(null, {status: 200, headers: {etag}});
+        });
+        mockedFetch.mockImplementationOnce(async (requestInfo: RequestInfo, requestInit: RequestInit): Promise<Response> => {
+            expect(requestInit.body).toEqual('{}');
+            expect(requestInfo).toEqual("http://localhost:9443/testing/test?nodeId=1&insert=asFirstChild");
+            // @ts-ignore
+            expect(requestInit.headers.ETag).toEqual(etag);
+            return new Response(null, {status: 200});
+        });
         await resource.update({nodeId: 1, data: '{}'});
-        await expect(await resource.read({})).toEqual([{}]);
     });
 
     test('Resource.update() non-existent', async () => {
-        await resource.create('[]');
+        mockedFetch.mockImplementationOnce(async (requestInfo: RequestInfo, requestInit: RequestInit): Promise<Response> => {
+            return new Response(null, {status: 200, headers: {etag: "blah"}});
+        });
+        mockedFetch.mockImplementationOnce(async (requestInfo: RequestInfo, requestInit: RequestInit): Promise<Response> => {
+            return new Response(null, {status: 500});
+        });
         const res = await resource.update({nodeId: 2, data: '{}'})
         await expect(res.ok).toBeFalsy();
     });
 
     test('Resource.readWithMetadata({})', async () => {
-        await resource.create('[]');
-        const res = await resource.readWithMetadata({revision: 1});
-        expect(res).toEqual({
+        const metadata = {
             "metadata": {
                 "nodeKey": 1,
                 "hash": 54776712958846245656800940890181827689,
@@ -106,16 +160,20 @@ describe('test Resource class', () => {
                 "descendantCount": 0,
                 "childCount": 0,
             },
+            // @ts-ignore
             "value": [],
+        };
+        mockedFetch.mockImplementationOnce(async (requestInfo: RequestInfo, requestInit: RequestInit): Promise<Response> => {
+            expect(requestInfo).toEqual("http://localhost:9443/testing/test?revision=1&withMetadata=true");
+            return new Response(JSON.stringify(metadata), {status: 200});
         });
+        const res = await resource.readWithMetadata({revision: 1});
+        expect(res).toEqual(metadata);
     });
 
     test('Resource.readWithMetadata({metaType: MetaType.KEY})',
         async () => {
-            await resource.create('[{"test": "dict"}]');
-            const res = await resource.readWithMetadata(
-                {metaType: MetaType.KEY});
-            expect(res).toEqual({
+            const metadata = {
                 "metadata": {"nodeKey": 1},
                 "value": [
                     {
@@ -129,34 +187,45 @@ describe('test Resource class', () => {
                         ]
                     }
                 ]
+            };
+            mockedFetch.mockImplementationOnce(async (requestInfo: RequestInfo, requestInit: RequestInit): Promise<Response> => {
+                expect(requestInfo).toEqual("http://localhost:9443/testing/test?withMetadata=nodeKey");
+                return new Response(JSON.stringify(metadata), {status: 200});
             });
+            const res = await resource.readWithMetadata(
+                {metaType: MetaType.KEY});
+            expect(res).toEqual(metadata);
         });
 
     test('Resource.readWithMetadata({metaType: MetaType.KEYAndCHILD})',
         async () => {
-            await resource.create('[{}]');
-            const res = await resource.readWithMetadata(
-                {metaType: MetaType.KEYAndChild});
-            expect(res).toEqual({
+            const metadata = {
                 "metadata": {"childCount": 1, "nodeKey": 1},
                 "value": [{"metadata": {"childCount": 0, "nodeKey": 2}, "value": {}}]
+            };
+            mockedFetch.mockImplementationOnce(async (requestInfo: RequestInfo, requestInit: RequestInit): Promise<Response> => {
+                expect(requestInfo).toEqual("http://localhost:9443/testing/test?withMetadata=nodeKeyAndChildCount");
+                return new Response(JSON.stringify(metadata), {status: 200});
             });
+            const res = await resource.readWithMetadata(
+                {metaType: MetaType.KEYAndChild});
+            expect(res).toEqual(metadata);
         });
 
     test('resource.history()', async () => {
-        await resource.create('[]');
-        await resource.update({nodeId: 1, data: '{}'});
-        await resource.delete(2, null);
+        const data = {
+            history: [{},{},{}]
+        };
+        mockedFetch.mockImplementationOnce(async (requestInfo: RequestInfo, requestInit: RequestInit): Promise<Response> => {
+            expect(requestInfo).toEqual("http://localhost:9443/testing/test/history");
+            return new Response(JSON.stringify(data), {status: 200});
+        });
         const res = await resource.history();
-        expect(res).toHaveLength(3);
+        expect(res).toEqual(data.history);
     });
 
     test('Resource.diff()', async () => {
-        await resource.create('[]');
-        await resource.update({nodeId: 1, data: '{}'});
-        const res = await resource.diff(1, 2,
-            {nodeId: 1, maxLevel: 4});
-        expect(res).toEqual([
+        const diff = [
             {
                 "insert": {
                     "nodeKey": 2,
@@ -168,6 +237,14 @@ describe('test Resource class', () => {
                     "data": "{}",
                 }
             }
-        ]);
+        ];
+        const data = {diffs: diff}
+        mockedFetch.mockImplementationOnce(async (requestInfo: RequestInfo, requestInit: RequestInit): Promise<Response> => {
+            expect(requestInfo).toEqual("http://localhost:9443/testing/test/diff?startNodeKey=1&maxDepth=4&first-revision=1&second-revision=2");
+            return new Response(JSON.stringify(data), {status: 200});
+        });
+        const res = await resource.diff(1, 2,
+            {nodeId: 1, maxLevel: 4});
+        expect(res).toEqual(diff);
     });
 });
