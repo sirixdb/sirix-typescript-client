@@ -2,12 +2,14 @@
   "name": "sirix",
   "version": "1.0.0",
   "description": "A typescript client library for interacting with SirixDB",
-  "main": "./index.ts",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
   "type": "commonjs",
   "scripts": {
     "build": "tsc",
     "test": "jest --runInBand"
   },
+  "prepublish": "tsc",
   "author": "Moshe Uminer",
   "license": "ISC",
   "dependencies": {

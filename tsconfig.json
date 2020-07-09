@@ -8,16 +8,11 @@
         "removeComments": true,
         "preserveConstEnums": true,
         "target": "es5",
-        "esModuleInterop": true
+        "esModuleInterop": true,
+        "outDir": "./dist"
     },
-    "files": [
-        "./src/auth.ts",
-        "./src/client.ts",
-        "./src/constants.ts",
-        "./src/database.ts",
-        "./src/info.ts",
-        "./src/resource.ts",
-        "./src/sirix.ts",
-        "./index.ts"
+    "exclude": [
+        "__tests__",
+        "resources"
     ]
 }
