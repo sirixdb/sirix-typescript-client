@@ -11,15 +11,15 @@
   "author": "Moshe Uminer",
   "license": "ISC",
   "dependencies": {
-    "@types/xmldom": "^0.1.29",
+    "@types/xmldom": "^0.1.30",
     "axios": "^0.19.2",
     "fetch-ponyfill": "^6.1.1",
     "xmldom": "^0.3.0"
   },
   "devDependencies": {
-    "@types/jest": "^25.2.1",
-    "jest": "^26.0.1",
-    "ts-jest": "^26.1.0",
-    "typescript": "^3.9.3"
+    "@types/jest": "^26.0.4",
+    "jest": "^26.1.0",
+    "ts-jest": "^26.1.1",
+    "typescript": "^3.9.6"
   }
 }
