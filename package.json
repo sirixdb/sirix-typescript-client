@@ -7,14 +7,13 @@
   "type": "commonjs",
   "scripts": {
     "build": "tsc",
-    "test": "jest --runInBand"
+    "test": "jest"
   },
   "prepublish": "tsc",
   "author": "Moshe Uminer",
   "license": "ISC",
   "dependencies": {
     "@types/xmldom": "^0.1.30",
-    "axios": "^0.19.2",
     "fetch-ponyfill": "^6.1.1",
     "xmldom": "^0.3.0"
   },

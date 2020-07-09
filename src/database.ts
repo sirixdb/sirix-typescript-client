@@ -1,5 +1,3 @@
-import {AxiosPromise} from 'axios';
-
 import {ContentType, DatabaseInfo, DBType} from './info'
 
 import Resource from './resource';

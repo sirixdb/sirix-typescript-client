@@ -1,5 +1,3 @@
-import Axios from 'axios';
-
 import Client from "./client";
 import Database from './database'
 
