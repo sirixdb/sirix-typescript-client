@@ -1,1 +1,3 @@
-# sirix-typescript-client
+# SirixDB Client Library
+
+### This is alpha software
