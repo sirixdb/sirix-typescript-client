@@ -1,15 +1,17 @@
 {
-  "name": "sirix",
-  "version": "1.0.0",
-  "description": "A typescript client library for interacting with SirixDB",
+  "name": "sirixdb",
+  "version": "0.1.0",
+  "description": "A client library for interacting with SirixDB, written in Typescript",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
-  "type": "commonjs",
+  "files": [
+    "dist"
+  ],
   "scripts": {
     "build": "tsc",
-    "test": "jest"
+    "test": "jest",
+    "prepublish": "tsc"
   },
-  "prepublish": "tsc",
   "author": "Moshe Uminer",
   "license": "ISC",
   "dependencies": {
