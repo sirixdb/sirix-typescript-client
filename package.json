@@ -10,7 +10,7 @@
   "scripts": {
     "build": "tsc",
     "test": "jest",
-    "prepublish": "tsc"
+    "prepublishOnly": "tsc"
   },
   "author": "Moshe Uminer",
   "license": "ISC",

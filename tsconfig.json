@@ -12,6 +12,7 @@
         "outDir": "./dist"
     },
     "exclude": [
+        "dist",
         "__tests__",
         "resources"
     ]
