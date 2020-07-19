@@ -2,7 +2,7 @@
     "compilerOptions": {
         "declaration": true,
         "lib": [ "es2015", "DOM" ],
-        "module": "ES6",
+        "module": "commonjs",
         "moduleResolution": "node",
         "noImplicitAny": true,
         "removeComments": true,
