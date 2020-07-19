@@ -10,11 +10,6 @@ enum ContentType {
     XML = "application/xml"
 }
 
-interface SirixInfo {
-    sirixUri: string
-    databaseInfo?: DatabaseInfo[]
-}
-
 interface DatabaseInfo {
     name: string
     type: string
@@ -162,7 +157,6 @@ interface MetaNode {
 export {
     DBType,
     ContentType,
-    SirixInfo,
     DatabaseInfo,
     LoginInfo,
     AuthData,
@@ -170,6 +164,7 @@ export {
     Params,
     ReadParams,
     MetaType,
+    Metadata,
     DiffParams,
     UpdateParams,
     QueryParams,
