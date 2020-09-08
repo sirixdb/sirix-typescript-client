@@ -69,8 +69,12 @@ describe('test Resource class', () => {
         mockedFetch.mockImplementationOnce(async (requestInfo: RequestInfo, requestInit: RequestInit): Promise<Response> => {
             return new Response(null, {status: 500});
         });
-        const res = await resource.delete(null, null);
-        expect(res.ok).toBeFalsy();
+        try {
+            await resource.delete(null, null);
+            // we should have already thrown an error
+            expect(true).toBe(false);
+        } catch {
+        }
     });
 
     test('Resource.read()', async () => {
@@ -94,8 +98,12 @@ describe('test Resource class', () => {
         mockedFetch.mockImplementationOnce(async (requestInfo: RequestInfo, requestInit: RequestInit): Promise<Response> => {
             return new Response(null, {status: 500});
         });
-        const res = await resource.getEtag(2);
-        await expect(res).toBeUndefined();
+        try {
+            await resource.getEtag(2);
+            // an error should've been thrown already
+            expect(true).toEqual(false);
+        } catch {
+        }
     });
 
     /*    test('Resource.delete() by nodeId', async () => {
@@ -147,8 +155,12 @@ describe('test Resource class', () => {
         mockedFetch.mockImplementationOnce(async (requestInfo: RequestInfo, requestInit: RequestInit): Promise<Response> => {
             return new Response(null, {status: 500});
         });
-        const res = await resource.update({nodeId: 2, data: '{}'})
-        await expect(res.ok).toBeFalsy();
+        try {
+            await resource.update({nodeId: 2, data: '{}'});
+            // an error should've already been thrown
+            expect(true).toEqual(false);
+        } catch {
+        }
     });
 
     test('Resource.readWithMetadata({})', async () => {
@@ -214,7 +226,7 @@ describe('test Resource class', () => {
 
     test('resource.history()', async () => {
         const data = {
-            history: [{},{},{}]
+            history: [{}, {}, {}]
         };
         mockedFetch.mockImplementationOnce(async (requestInfo: RequestInfo, requestInit: RequestInit): Promise<Response> => {
             expect(requestInfo).toEqual("http://localhost:9443/testing/test/history");

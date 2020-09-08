@@ -52,10 +52,12 @@ describe("test authentication", () => {
             await client.init(
                 {username: "admin", password: "admin"},
                 "http://localhost:9443");
+            // an error should've already been thrown
+            expect(true).toEqual(false);
         } catch (e) {
             expect(e.message).toEqual("failed to retrieve an access token using credentials");
         }
-        expect(errorSpy).toHaveBeenCalledWith(401, "invalid credentials");
+        expect(errorSpy).toHaveBeenCalledWith("401, invalid credentials");
         expect(debugSpy).toHaveBeenCalledWith("failed to retrieve an access token using credentials. aborting");
     });
 

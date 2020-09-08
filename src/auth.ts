@@ -21,11 +21,11 @@ export function initClient(loginInfo: LoginInfo, sirixUri: string): Promise<Auth
             mode: "cors",
             body: JSON.stringify({...loginInfo, grant_type: "password"})
         })
-            .then(res => {
+            .then(async res => {
                 if (!res.ok) {
-                    res.text()
+                    await res.text()
                         .then(text => {
-                            console.error(res.status, text);
+                            console.error(`${res.status}, ${text}`);
                             console.debug("failed to retrieve an access token using credentials. aborting");
                             throw Error("failed to retrieve an access token using credentials");
                         });
