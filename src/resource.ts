@@ -54,11 +54,7 @@ export default class Resource {
         return this._client.readResource(this.dbName, this.contentType,
             this.name, {...params, prettyPrint: false})
             .then(res => {
-                if (!res.ok) {
-                    res.text().then(text => {
-                        throw new Error(text);
-                    });
-                } else if (this.dbType === DBType.JSON) {
+                if (this.dbType === DBType.JSON) {
                     return res.json();
                 } else {
                     return res.text()
@@ -85,13 +81,7 @@ export default class Resource {
         return this._client.readResource(this.dbName, this.contentType,
             this.name, params)
             .then(res => {
-                if (!res.ok) {
-                    res.text().then(text => {
-                        throw new Error(text);
-                    })
-                } else {
-                    return res.json();
-                }
+                return res.json();
             });
     }
 

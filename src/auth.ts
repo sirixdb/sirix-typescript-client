@@ -92,7 +92,14 @@ export function initClient(loginInfo: LoginInfo, sirixUri: string): Promise<Auth
         }
         const url = new URL(urlString, sirixUri)
         Object.keys(params).forEach(key => url.searchParams.append(key, params[key]));
-        return fetch(url.toString(), requestInit);
+        return fetch(url.toString(), requestInit).then(res => {
+            if (!res.ok) {
+                res.text().then(text => {
+                    throw new Error(text);
+                });
+            }
+            return res;
+        });
     }
 
     return getTokenWithCredentials()
