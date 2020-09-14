@@ -134,15 +134,14 @@ enum NodeType {
 interface Metadata {
     nodeKey: number;
     hash: number;
-    type: NodeType;
+    type: keyof typeof NodeType;
     descendantCount?: number; // only for type OBJECT and ARRAY
     childCount?: number; // only for type OBJECT and ARRAY
 }
 
 interface MetaNode {
     metadata: Metadata;
-    key?:
-        | string; // if metadata.type === OBJECT_KEY
+    key?: string; // if metadata.type === OBJECT_KEY
     value:
         | MetaNode[]  // if metadata.type === OBJECT or ARRAY alternatively
         | {}      // if can be an empty object, if metadata.childCount === 0
