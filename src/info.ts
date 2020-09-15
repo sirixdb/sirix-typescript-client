@@ -144,7 +144,7 @@ enum NodeType {
 interface Metadata {
     nodeKey: number;
     hash: number;
-    type: keyof typeof NodeType;
+    type: NodeType;
     descendantCount?: number; // only for type OBJECT and ARRAY
     childCount?: number; // only for type OBJECT and ARRAY
 }
