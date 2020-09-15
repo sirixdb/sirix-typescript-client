@@ -94,27 +94,43 @@ interface DiffResponse {
     diffs: Diff[]
 }
 
+enum insertPosition {
+    child = "asFirstChild",
+    left = "asLeftSibling",
+    right = "asRightSibling",
+    replace = "replace"
+}
+
+type dataType = "string" | "number" | "boolean" | "null" | "jsonFragment";
+
 interface Diff {
     insert?: {
-        oldNodeKey: number,
-        newNodeKey: number,
+        nodeKey: number,
         insertPositionNodeKey: number,
-        insertPosition: string,
-        type: string,
+        insertPosition: keyof typeof insertPosition,
+        deweyID: string,
+        depth: number,
+        type: dataType,
         data: string
     },
     replace?: {
         oldNodeKey: number,
         newNodeKey: number,
-        type: string,
+        deweyID: string,
+        depth: number,
+        type: dataType,
         data: string
     },
     update?: {
         nodeKey: number,
-        type: string,
+        type: dataType,
         value: string | number | boolean
     },
-    delete?: number
+    delete?: {
+        nodeKey: number,
+        deweyID: string,
+        depth: number
+    }
 }
 
 enum NodeType {
