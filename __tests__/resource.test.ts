@@ -237,18 +237,17 @@ describe('test Resource class', () => {
     });
 
     test('Resource.diff()', async () => {
-        const diff = [
-            {
-                "insert": {
-                    "nodeKey": 2,
-                    "insertPositionNodeKey": 1,
-                    "insertPosition": "asFirstChild",
-                    "deweyID": "1.3.3",
-                    "depth": 2,
-                    "type": "jsonFragment",
-                    "data": "{}",
-                }
+        const diff = [{
+            "insert": {
+                "data": "{}",
+                "depth": 2,
+                "deweyID": "1.3.3",
+                "insertPosition": "asFirstChild",
+                "insertPositionNodeKey": 1,
+                "nodeKey": 2,
+                "type": "jsonFragment"
             }
+        }
         ];
         const data = {diffs: diff}
         mockedFetch.mockImplementationOnce(async (requestInfo: RequestInfo, requestInit: RequestInit): Promise<Response> => {
@@ -257,6 +256,6 @@ describe('test Resource class', () => {
         });
         const res = await resource.diff(1, 2,
             {nodeId: 1, maxLevel: 4});
-        expect(res).toEqual(diff);
+        expect(res).toEqual(data);
     });
 });

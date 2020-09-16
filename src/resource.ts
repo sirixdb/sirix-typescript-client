@@ -150,10 +150,7 @@ export default class Resource {
         }
         return this._client.diff(this.dbName, this.name, params)
             .then(res => {
-                return res.json()
-                    .then(data => {
-                        return data.diffs;
-                    })
+                return res.json();
             });
     }
 
