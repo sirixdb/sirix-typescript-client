@@ -50,7 +50,9 @@ interface ReadParams {
     "start-revision"?: number,
     "end-revision"?: number,
     "start-revision-timestamp"?: string,
-    "end-revision-timestamp"?: string
+    "end-revision-timestamp"?: string,
+    lastTopLevelNodeKey?: number,
+    nextTopLevelNodes?: number
 }
 
 enum MetaType {
@@ -97,7 +99,7 @@ interface DiffResponse {
 type insertPosition = "asFirstChild" | "asLeftSibling" | "asRightSibling" | "replace";
 type dataType = "string" | "number" | "boolean" | "null" | "jsonFragment";
 
-interface Diff {
+interface InsertDiff {
     insert?: {
         nodeKey: number,
         insertPositionNodeKey: number,
@@ -106,7 +108,10 @@ interface Diff {
         depth: number,
         type: dataType,
         data: string
-    },
+    }
+}
+
+interface ReplaceDiff {
     replace?: {
         oldNodeKey: number,
         newNodeKey: number,
@@ -114,18 +119,26 @@ interface Diff {
         depth: number,
         type: dataType,
         data: string
-    },
+    }
+}
+
+interface UpdateDiff {
     update?: {
         nodeKey: number,
         type: dataType,
         value: string | number | boolean
-    },
+    }
+}
+
+interface DeleteDiff {
     delete?: {
         nodeKey: number,
         deweyID: string,
         depth: number
     }
 }
+
+type Diff = InsertDiff | ReplaceDiff | UpdateDiff | DeleteDiff;
 
 enum NodeType {
     OBJECT = "OBJECT",
@@ -179,6 +192,10 @@ export {
     QueryParams,
     Commit,
     DiffResponse,
+    InsertDiff,
+    ReplaceDiff,
+    UpdateDiff,
+    DeleteDiff,
     Diff,
     MetaNode,
     NodeType

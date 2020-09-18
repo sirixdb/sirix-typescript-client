@@ -48,7 +48,9 @@ export default class Resource {
     public read(inputParams: {
         nodeId?: number,
         revision?: Revision | [Revision, Revision],
-        maxLevel?: number
+        maxLevel?: number,
+        nextTopLevelNodes?: number,
+        lastTopLevelNodeKey?: number
     } | undefined): Promise<JSON | Document> {
         const params = Resource._readParams(inputParams || {});
         return this._client.readResource(this.dbName, this.contentType,
@@ -72,7 +74,9 @@ export default class Resource {
         nodeId?: number,
         revision?: Revision | [Revision, Revision],
         maxLevel?: number,
-        metaType?: MetaType
+        metaType?: MetaType,
+        nextTopLevelNodes?: number,
+        lastTopLevelNodeKey?: number
     }): Promise<MetaNode> {
         const params = Resource._readParams({
             ...inputParams,
@@ -89,16 +93,17 @@ export default class Resource {
         nodeId?: number,
         revision?: Revision | [Revision, Revision],
         maxLevel?: number,
-        metaType?: MetaType
+        metaType?: MetaType,
+        nextTopLevelNodes?: number,
+        lastTopLevelNodeKey?: number
     }): ReadParams {
-        let {nodeId, revision, maxLevel, metaType} = {...inputParams};
-        let params: ReadParams = {}
-        if (nodeId) {
-            params['nodeId'] = nodeId;
-        }
-        if (maxLevel) {
-            params['maxLevel'] = maxLevel;
-        }
+        let {nodeId, revision, maxLevel, metaType, nextTopLevelNodes, lastTopLevelNodeKey} = inputParams;
+        let params: ReadParams = {
+            ...(nodeId && {nodeId}),
+            ...(maxLevel && {maxLevel}),
+            ...(nextTopLevelNodes && {nextTopLevelNodes}),
+            ...(lastTopLevelNodeKey && {lastTopLevelNodeKey})
+        };
         if (revision) {
             if (typeof revision === 'number') {
                 params['revision'] = revision;
