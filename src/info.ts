@@ -1,4 +1,5 @@
 import {Insert} from "./constants";
+import {EventCallback} from "./auth";
 
 enum DBType {
     JSON = "JSON",
@@ -176,6 +177,12 @@ interface MetaNode {
         | null;   // if metadata.type === OBJECT_NULL_VALUE or NULL_VALUE
 }
 
+interface EventCallbacks {
+    uploadProgressCallback: EventCallback;
+    loadCallback: EventCallback;
+    errorCallback: EventCallback;
+}
+
 export {
     DBType,
     ContentType,
@@ -198,5 +205,6 @@ export {
     DeleteDiff,
     Diff,
     MetaNode,
-    NodeType
+    NodeType,
+    EventCallbacks,
 }

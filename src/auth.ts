@@ -1,14 +1,23 @@
-import {AuthData, LoginInfo, Params} from "./info";
+import {AuthData, ContentType, LoginInfo, Params} from "./info";
 import fetchPonyfill from "fetch-ponyfill";
 
 const {fetch} = fetchPonyfill();
 
 export type request = (urlString: string, requestInit: RequestInit, params?: Params) => Promise<Response>;
 export type shutdown = () => void;
+export type EventCallback = (ev: Event) => any;
+export type BrowserUploadRequest = (
+    urlString: string,
+    contentType: ContentType,
+    body: string,
+    uploadProgressCallback: EventCallback,
+    loadCallback: EventCallback,
+    errorCallback: EventCallback) => void;
 
 interface Auth {
     request: request
     shutdown: shutdown;
+    browserUploadRequest: BrowserUploadRequest;
 }
 
 export function initClient(loginInfo: LoginInfo, sirixUri: string): Promise<Auth> {
@@ -64,11 +73,11 @@ export function initClient(loginInfo: LoginInfo, sirixUri: string): Promise<Auth
             mode: "cors",
             body: JSON.stringify({refresh_token: authData.refresh_token, grant_type: 'refresh_token'})
         }).then(res => {
-                if (res.status === 200) {
-                    return res.json();
-                }
-                return undefined;
-            })
+            if (res.status === 200) {
+                return res.json();
+            }
+            return undefined;
+        })
             .catch(err => {
                 console.error(err);
                 return undefined;
@@ -102,8 +111,26 @@ export function initClient(loginInfo: LoginInfo, sirixUri: string): Promise<Auth
         });
     }
 
+    function browserUploadRequest(
+        urlString: string,
+        contentType: ContentType,
+        body: string,
+        uploadProgressCallback: EventCallback,
+        loadCallback: EventCallback,
+        errorCallback: EventCallback,
+    ) {
+        const xhr = new XMLHttpRequest();
+        xhr.open("PUT", new URL(urlString, sirixUri).toString(), true);
+        xhr.setRequestHeader('content-type', contentType);
+        xhr.setRequestHeader('authorization', `${authData.token_type} ${authData.access_token}`);
+        xhr.onerror = errorCallback;
+        xhr.onload = loadCallback;
+        xhr.upload.onprogress = uploadProgressCallback;
+        xhr.send(body);
+    }
+
     return getTokenWithCredentials()
         .then(() => {
-            return {request, shutdown};
+            return {request, shutdown, browserUploadRequest};
         })
 }

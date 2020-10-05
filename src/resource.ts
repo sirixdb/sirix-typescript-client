@@ -5,7 +5,7 @@ import {
     ContentType,
     DBType,
     DiffParams,
-    DiffResponse,
+    DiffResponse, EventCallbacks,
     MetaNode,
     MetaType,
     QueryParams,
@@ -35,6 +35,10 @@ export default class Resource {
     public create(data: string): Promise<Response> {
         return this._client.createResource(this.dbName,
             this.contentType, this.name, data);
+    }
+
+    public createBrowser(data: string, eventCallbacks: EventCallbacks) {
+        return this._client.createResourceBrowser(this.dbName, this.contentType, this.name, data, eventCallbacks);
     }
 
     public exists(): Promise<boolean> {

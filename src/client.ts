@@ -1,14 +1,26 @@
-import {initClient, request, shutdown} from "./auth";
-import {Commit, ContentType, DiffParams, LoginInfo, Params, QueryParams, ReadParams, UpdateParams} from "./info";
+import {BrowserUploadRequest, initClient, request, shutdown} from "./auth";
+import {
+    Commit,
+    ContentType,
+    DiffParams,
+    EventCallbacks,
+    LoginInfo,
+    Params,
+    QueryParams,
+    ReadParams,
+    UpdateParams
+} from "./info";
 
 export default class Client {
     private _request: request;
+    private _browserUploadRequest: BrowserUploadRequest;
     public shutdown: shutdown;
 
     public init(loginInfo: LoginInfo, sirixUri: string) {
         return initClient(loginInfo, sirixUri)
-            .then(({request, shutdown}) => {
+            .then(({request, shutdown, browserUploadRequest}) => {
                 this._request = request;
+                this._browserUploadRequest = browserUploadRequest;
                 this.shutdown = shutdown;
             });
     }
@@ -61,6 +73,12 @@ export default class Client {
             headers: {"content-type": contentType},
             body
         });
+    }
+
+    public createResourceBrowser(dbName: string, contentType: ContentType,
+                                 resource: string, body: string, callbacks: EventCallbacks) {
+        return this._browserUploadRequest(`/${dbName}/${resource}`, contentType, body,
+            callbacks.uploadProgressCallback, callbacks.loadCallback, callbacks.errorCallback);
     }
 
     public readResource(dbName: string, contentType: ContentType,
