@@ -8,7 +8,7 @@ const Response = jest.requireActual('fetch-ponyfill')().Response;
 mockedFetch = mocked(mockedFetch, true);
 
 import {Sirix, sirixInit} from "../src/sirix";
-import {token, postQuery} from "../resources/data";
+import {token, postQuery} from "./data";
 
 describe('test Sirix class', () => {
     let sirix: Sirix;

@@ -7,6 +7,7 @@ module.exports = {
       './src/*(?<!.d).ts'
   ],
   testPathIgnorePatterns: [
-      "./__tests__/xml.test.ts"
+      "./__tests__/xml.test.ts",
+      "./__tests__/data.ts",
   ]
 };

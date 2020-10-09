@@ -11,7 +11,7 @@ import {Sirix, sirixInit} from "../src/sirix";
 import Database from "../src/database";
 import {DBType, MetaType} from "../src/info";
 import Resource from "../src/resource";
-import {token, resourceQuery} from "../resources/data"
+import {token, resourceQuery} from "./data"
 
 
 describe('test Resource class', () => {

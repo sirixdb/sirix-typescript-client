@@ -9,7 +9,7 @@ mockedFetch = mocked(mockedFetch, true);
 
 import Client from "../src/client";
 import {initClient} from '../src/auth';
-import {token} from "../resources/data";
+import {token} from "./data";
 
 describe("test authentication", () => {
     beforeEach(() => {

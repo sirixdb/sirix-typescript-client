@@ -11,7 +11,7 @@ import {Sirix, sirixInit} from "../src/sirix";
 import Database from "../src/database";
 import {DBType} from "../src/info";
 import Resource from "../src/resource";
-import {token} from "../resources/data";
+import {token} from "./data";
 
 
 describe('test Database class', () => {
