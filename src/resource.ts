@@ -15,7 +15,7 @@ import {
 } from './info';
 import Client from "./client";
 
-import {DOMParser} from "xmldom";
+import {DOMParser} from "@xmldom/xmldom";
 
 const domParser = new DOMParser();
 

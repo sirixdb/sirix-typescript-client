@@ -1,5 +1,6 @@
 import {AuthData, ContentType, LoginInfo, Params} from "./info";
 import fetchPonyfill from "fetch-ponyfill";
+import {ServerError} from "./constants";
 
 const {fetch} = fetchPonyfill();
 
@@ -36,7 +37,7 @@ export function initClient(loginInfo: LoginInfo, sirixUri: string): Promise<Auth
                         .then(text => {
                             console.error(`${res.status}, ${text}`);
                             console.debug("failed to retrieve an access token using credentials. aborting");
-                            throw Error("failed to retrieve an access token using credentials");
+                            throw new ServerError(res.status, text);
                         });
                 } else {
                     return res.json().then(data => {
@@ -89,22 +90,18 @@ export function initClient(loginInfo: LoginInfo, sirixUri: string): Promise<Auth
     }
 
     function request(urlString: string, requestInit: RequestInit, params: Params = {}) {
-        if (typeof requestInit.headers === "object") {
-            requestInit.headers = {
-                ...requestInit.headers,
-                authorization: `${authData.token_type} ${authData.access_token}`
-            };
-        } else {
-            requestInit.headers = {
-                authorization: `${authData.token_type} ${authData.access_token}`
-            }
+        requestInit.headers = {
+            ...requestInit.headers,
+            authorization: `${authData.token_type} ${authData.access_token}`
+        };
+        const url = new URL(urlString, sirixUri);
+        for (const key of Object.keys(params)) {
+            url.searchParams.append(key, params[key]);
         }
-        const url = new URL(urlString, sirixUri)
-        Object.keys(params).forEach(key => url.searchParams.append(key, params[key]));
         return fetch(url.toString(), requestInit).then(async res => {
             if (!res.ok) {
                 await res.text().then(text => {
-                    throw new Error(text);
+                    throw new ServerError(res.status, text)
                 });
             }
             return res;

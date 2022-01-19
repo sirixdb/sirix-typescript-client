@@ -1,11 +1,9 @@
-import {mocked} from "ts-jest/utils";
-
 let mockedFetch = jest.fn();
 jest.mock('fetch-ponyfill', () => {
     return () => ({fetch: mockedFetch})
 });
 const Response = jest.requireActual('fetch-ponyfill')().Response;
-mockedFetch = mocked(mockedFetch, true);
+mockedFetch = jest.mocked(mockedFetch, true);
 
 import Client from "../src/client";
 import {initClient} from '../src/auth';
@@ -55,7 +53,7 @@ describe("test authentication", () => {
             // an error should've already been thrown
             expect(true).toEqual(false);
         } catch (e) {
-            expect(e.message).toEqual("failed to retrieve an access token using credentials");
+            expect(e.message).toEqual("invalid credentials");
         }
         expect(errorSpy).toHaveBeenCalledWith("401, invalid credentials");
         expect(debugSpy).toHaveBeenCalledWith("failed to retrieve an access token using credentials. aborting");

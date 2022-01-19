@@ -1,11 +1,9 @@
-import {mocked} from "ts-jest/utils";
-
 let mockedFetch = jest.fn();
 jest.mock('fetch-ponyfill', () => {
     return () => ({fetch: mockedFetch})
 });
 const Response = jest.requireActual('fetch-ponyfill')().Response;
-mockedFetch = mocked(mockedFetch, true);
+mockedFetch = jest.mocked(mockedFetch, true);
 
 import {Sirix, sirixInit} from "../src/sirix";
 import Database from "../src/database";

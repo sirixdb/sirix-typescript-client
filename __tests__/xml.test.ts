@@ -2,7 +2,7 @@ import {Sirix, sirixInit} from "../src/sirix";
 import Database from "../src/database";
 import Resource from "../src/resource";
 import {DBType} from "../src/info";
-import {DOMParser} from "xmldom";
+import {DOMParser} from "@xmldom/xmldom";
 
 const domParser = new DOMParser();
 const xmlNode = domParser.parseFromString(`

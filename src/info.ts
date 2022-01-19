@@ -101,7 +101,7 @@ type insertPosition = "asFirstChild" | "asLeftSibling" | "asRightSibling" | "rep
 type dataType = "string" | "number" | "boolean" | "null" | "jsonFragment";
 
 interface InsertDiff {
-    insert?: {
+    insert: {
         nodeKey: number,
         insertPositionNodeKey: number,
         insertPosition: insertPosition,
@@ -113,7 +113,7 @@ interface InsertDiff {
 }
 
 interface ReplaceDiff {
-    replace?: {
+    replace: {
         oldNodeKey: number,
         newNodeKey: number,
         deweyID: string,
@@ -124,7 +124,7 @@ interface ReplaceDiff {
 }
 
 interface UpdateDiff {
-    update?: {
+    update: {
         nodeKey: number,
         type: dataType,
         value: string | number | boolean
@@ -132,7 +132,7 @@ interface UpdateDiff {
 }
 
 interface DeleteDiff {
-    delete?: {
+    delete: {
         nodeKey: number,
         deweyID: string,
         depth: number
