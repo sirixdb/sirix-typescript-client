@@ -1,6 +1,7 @@
 import {ContentType, DatabaseInfo, DBType} from './info'
 
 import Resource from './resource';
+import JsonStore from './jsonStore';
 import Client from "./client";
 
 export default class Database {
@@ -29,6 +30,17 @@ export default class Database {
     public resource(name: string): Resource {
         return new Resource(this.name, name, this.dbType, this.contentType,
             this._client);
+    }
+
+    /**
+     * jsonStore - returns a JsonStore instance for high-level JSON document operations.
+     * Only valid for JSON-type databases.
+     */
+    public jsonStore(name: string): JsonStore {
+        if (this.dbType !== DBType.JSON) {
+            throw new Error("JsonStore is only available for JSON databases");
+        }
+        return new JsonStore(this.name, name, this._client);
     }
 
     /**

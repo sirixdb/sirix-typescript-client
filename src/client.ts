@@ -2,6 +2,7 @@ import {BrowserUploadRequest, initClient, request, shutdown} from "./auth";
 import {
     Commit,
     ContentType,
+    CreateResourceParams,
     DiffParams,
     EventCallbacks,
     LoginInfo,
@@ -67,12 +68,25 @@ export default class Client {
     }
 
     public createResource(dbName: string, contentType: ContentType,
-                          resource: string, body: string): Promise<Response> {
+                          resource: string, body: string,
+                          resourceParams?: CreateResourceParams): Promise<Response> {
+        const params: Params = {};
+        if (resourceParams) {
+            if (resourceParams.hashType) {
+                params.hashType = resourceParams.hashType;
+            }
+            if (resourceParams.useDeweyIDs !== undefined) {
+                params.useDeweyIDs = resourceParams.useDeweyIDs.toString();
+            }
+            if (resourceParams.hashKind) {
+                params.hashKind = resourceParams.hashKind;
+            }
+        }
         return this._request(`/${dbName}/${resource}`, {
             method: "PUT",
             headers: {"content-type": contentType},
             body
-        });
+        }, params);
     }
 
     public createResourceBrowser(dbName: string, contentType: ContentType,

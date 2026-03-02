@@ -3,6 +3,7 @@ import {Insert} from './constants';
 import {
     Commit,
     ContentType,
+    CreateResourceParams,
     DBType,
     DiffParams,
     DiffResponse, EventCallbacks,
@@ -32,9 +33,9 @@ export default class Resource {
     /**
      * create
      */
-    public create(data: string): Promise<Response> {
+    public create(data: string, resourceParams?: CreateResourceParams): Promise<Response> {
         return this._client.createResource(this.dbName,
-            this.contentType, this.name, data);
+            this.contentType, this.name, data, resourceParams);
     }
 
     public createBrowser(data: string, eventCallbacks: EventCallbacks) {
@@ -156,7 +157,8 @@ export default class Resource {
      */
     public diff(firstRevision: Revision, secondRevision: Revision, inputParams?: {
         nodeId?: number,
-        maxLevel?: number
+        maxLevel?: number,
+        includeData?: boolean,
     }): Promise<DiffResponse> {
         let params: DiffParams = {}
         if (inputParams) {
@@ -165,6 +167,9 @@ export default class Resource {
             }
             if (inputParams.maxLevel) {
                 params.maxDepth = inputParams.maxLevel;
+            }
+            if (inputParams.includeData !== undefined) {
+                params["include-data"] = inputParams.includeData.toString();
             }
         }
         if (typeof firstRevision === "number" && typeof secondRevision === "number") {

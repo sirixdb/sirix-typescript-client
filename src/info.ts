@@ -66,7 +66,14 @@ interface DiffParams {
     "first-revision"?: string | number,
     "second-revision"?: string | number,
     startNodeKey?: number,
-    maxDepth?: number
+    maxDepth?: number,
+    "include-data"?: string,
+}
+
+interface CreateResourceParams {
+    hashType?: "ROLLING" | "NONE",
+    useDeweyIDs?: boolean,
+    hashKind?: string,
 }
 
 interface UpdateParams {
@@ -183,6 +190,23 @@ interface EventCallbacks {
     errorCallback: EventCallback;
 }
 
+interface SubtreeRevision {
+    revisionTimestamp: string,
+    revisionNumber: number,
+}
+
+interface RevisionResult {
+    revisionTimestamp: string,
+    revisionNumber: number,
+    revision: any,
+}
+
+interface QueryResult {
+    revisionNumber: number,
+    revisionTimestamp: string,
+    revision: any,
+}
+
 export {
     DBType,
     ContentType,
@@ -195,6 +219,7 @@ export {
     MetaType,
     Metadata,
     DiffParams,
+    CreateResourceParams,
     UpdateParams,
     QueryParams,
     Commit,
@@ -207,4 +232,7 @@ export {
     MetaNode,
     NodeType,
     EventCallbacks,
+    SubtreeRevision,
+    RevisionResult,
+    QueryResult,
 }
