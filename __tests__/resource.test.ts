@@ -341,14 +341,32 @@ describe('test Resource class', () => {
         expect(res).toEqual([]);
     });
 
-    test('Resource.read() with nextTopLevelNodes and lastTopLevelNodeKey', async () => {
+    test('Resource.read() with nextTopLevelNodes and startNodeKey', async () => {
         mockedFetch.mockImplementationOnce(async (requestInfo: RequestInfo, requestInit: RequestInit): Promise<Response> => {
             expect(requestInfo).toContain("nextTopLevelNodes=10");
-            expect(requestInfo).toContain("lastTopLevelNodeKey=5");
+            expect(requestInfo).toContain("startNodeKey=5");
             return new Response('[]', {status: 200});
         });
-        const res = await resource.read({nextTopLevelNodes: 10, lastTopLevelNodeKey: 5});
+        const res = await resource.read({nextTopLevelNodes: 10, startNodeKey: 5});
         expect(res).toEqual([]);
+    });
+
+    test('Resource.read() pages with startNodeKey and never sends lastTopLevelNodeKey', async () => {
+        const urls: string[] = [];
+        for (const body of ['[1]', '[2]', '[3]']) {
+            mockedFetch.mockImplementationOnce(async (requestInfo: RequestInfo): Promise<Response> => {
+                urls.push(requestInfo as string);
+                return new Response(body, {status: 200});
+            });
+        }
+        const page1 = await resource.read({nextTopLevelNodes: 10});
+        const page2 = await resource.read({nextTopLevelNodes: 10, startNodeKey: 11});
+        const page3 = await resource.read({nextTopLevelNodes: 10, startNodeKey: 21});
+        expect([page1, page2, page3]).toEqual([[1], [2], [3]]);
+        expect(urls[0]).not.toContain("startNodeKey");
+        expect(urls[1]).toContain("startNodeKey=11");
+        expect(urls[2]).toContain("startNodeKey=21");
+        urls.forEach(u => expect(u).not.toContain("lastTopLevelNodeKey"));
     });
 
     test('Resource.diff() with Date revisions', async () => {

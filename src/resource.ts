@@ -55,7 +55,7 @@ export default class Resource {
         revision?: Revision | [Revision, Revision],
         maxLevel?: number,
         nextTopLevelNodes?: number,
-        lastTopLevelNodeKey?: number,
+        startNodeKey?: number,
         numberOfNodes?: number,
         maxChildren?: number,
     } | undefined): Promise<JSON | Document> {
@@ -83,7 +83,7 @@ export default class Resource {
         maxLevel?: number,
         metaType?: MetaType,
         nextTopLevelNodes?: number,
-        lastTopLevelNodeKey?: number,
+        startNodeKey?: number,
         numberOfNodes?: number,
         maxChildren?: number,
     }): Promise<MetaNode> {
@@ -104,7 +104,7 @@ export default class Resource {
         maxLevel?: number,
         metaType?: MetaType,
         nextTopLevelNodes?: number,
-        lastTopLevelNodeKey?: number,
+        startNodeKey?: number,
         numberOfNodes?: number,
         maxChildren?: number,
     }): ReadParams {
@@ -114,7 +114,7 @@ export default class Resource {
             maxLevel,
             metaType,
             nextTopLevelNodes,
-            lastTopLevelNodeKey,
+            startNodeKey,
             numberOfNodes,
             maxChildren
         } = inputParams;
@@ -122,7 +122,7 @@ export default class Resource {
             ...(nodeId && {nodeId}),
             ...(maxLevel && {maxLevel}),
             ...(nextTopLevelNodes && {nextTopLevelNodes}),
-            ...(lastTopLevelNodeKey && {lastTopLevelNodeKey}),
+            ...(startNodeKey && {startNodeKey}),
             ...(numberOfNodes && {numberOfNodes}),
             ...(maxChildren && {maxChildren}),
         };
