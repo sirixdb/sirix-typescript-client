@@ -2,4 +2,6 @@
 
 ## Unreleased
 
-- **Breaking:** the paginated read option `lastTopLevelNodeKey` is renamed to `startNodeKey` (`Resource.read`, `Resource.readWithMetadata`, `ReadParams`). The client sends `startNodeKey` on the wire; there is no deprecated alias. The Sirix server answers a request carrying `lastTopLevelNodeKey` with a 400 that names `startNodeKey`.
+- **Breaking:** see the [paginated read migration](README.md#paginated-reads).
+  This client change must land before or together with the Sirix server PR on
+  branch `fm/sirix-pagination-param-compat`.
