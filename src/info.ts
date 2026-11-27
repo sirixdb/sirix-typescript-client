@@ -52,7 +52,7 @@ interface ReadParams {
     "end-revision"?: number,
     "start-revision-timestamp"?: string,
     "end-revision-timestamp"?: string,
-    lastTopLevelNodeKey?: number,
+    startNodeKey?: number,
     nextTopLevelNodes?: number
 }
 
